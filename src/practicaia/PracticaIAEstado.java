@@ -23,6 +23,25 @@ public class PracticaIAEstado {
     private int[] sensorDestino;
     private HashMap<Integer,HashSet<Integer>> redSensores;
     private HashMap<Integer,HashSet<Integer>> redCentros;
+
+    PracticaIAEstado(PracticaIAEstado estado) {
+        this.redSensores = PracticaIAEstado.copiaRed(estado.redSensores);
+        this.redCentros = PracticaIAEstado.copiaRed(estado.redCentros);
+        this.sensorDestino = estado.sensorDestino.clone();
+    }
+    
+    private static HashMap<Integer, HashSet<Integer>> copiaRed(HashMap<Integer, HashSet<Integer>> original) {
+        HashMap<Integer, HashSet<Integer>> copia = new HashMap<>();
+        for (Integer key : original.keySet()) {
+            copia.put(key, new HashSet<>());
+            
+            for (Integer value : original.get(key)) {
+                copia.get(key).add(value);
+            }            
+        }
+        
+        return copia;
+    }
     
     private double calcularDistancia(Sensor a, Sensor b) {
         return Math.sqrt(Math.pow(a.getCoordX() - b.getCoordX(), 2) 
@@ -69,7 +88,7 @@ public class PracticaIAEstado {
         }
         return false;
     } 
-    
+        
     public double calcularDistanciaSubArbolSensor(int indiceSensor) {
         double distancia = 0.0;
         
@@ -83,9 +102,10 @@ public class PracticaIAEstado {
     
     public double calcularDistanciaCentroIessimo(int indiceCentro) {
         double distancia = 0.0;
+        indiceCentro = indiceCentro + NUM_SENSORES;
         
         for (Integer s : this.redCentros.get(indiceCentro)) {
-            distancia = distancia + matrizDistanciasSensoresACentro[s][indiceCentro]; 
+            distancia = distancia + matrizDistanciasSensoresACentro[s][indiceCentro - NUM_SENSORES]; 
             distancia = distancia + calcularDistanciaSubArbolSensor(s);
         }
         
@@ -115,13 +135,11 @@ public class PracticaIAEstado {
     public void generarEstadoInicial() {
         int indiceSensor = 0;
         int indiceCentro = 0;
-        while (indiceSensor < NUM_SENSORES && 
-                this.redCentros.get(NUM_CENTROS - 1).size() < MAX_CONEXIONES_CENTROS) {
-            
-            this.redCentros.get(indiceCentro).add(indiceSensor);
+        while (indiceSensor < NUM_SENSORES && aceptaConexion(NUM_SENSORES + NUM_CENTROS - 1)) {            
+            this.redCentros.get(indiceCentro + NUM_SENSORES).add(indiceSensor);
             
             ++indiceSensor;
-            indiceCentro = ++indiceCentro % NUM_CENTROS;            
+            indiceCentro = ++indiceCentro % NUM_CENTROS;
         }
         
         int offset = NUM_CENTROS * MAX_CONEXIONES_CENTROS;
@@ -141,9 +159,9 @@ public class PracticaIAEstado {
             ++i;
         }
     }
+    
     //conectar sensorA a sensorB
-    public boolean mover(int sensor, int destino){
-        //mirar si sensorA está conectado a un centro 
+    public boolean mover(int sensor, int destino) {        
         int destinoAnterior = sensorDestino[sensor];
         sensorDestino[sensor] = destino;
         
@@ -156,6 +174,7 @@ public class PracticaIAEstado {
             desconectarSensorAEnB(sensor, destinoAnterior);
             conectarSensorAEnB(sensor, destino);
         }
+        
        return true;
     }
     
@@ -203,8 +222,9 @@ public class PracticaIAEstado {
     }
     
     public boolean centroAceptaConexion(int indiceCentro) {
-        return this.redCentros.get(getCentroId(indiceCentro)).size() < MAX_CONEXIONES_CENTROS;
+        return this.redCentros.get(indiceCentro).size() < MAX_CONEXIONES_CENTROS;
     }
+    
     private boolean aceptaConexion(int sensor) {
         if(esCentro(sensor))
         {
@@ -214,6 +234,10 @@ public class PracticaIAEstado {
         {
             return sensorAceptaConexion(sensor);
         }
+    }
+        
+    private boolean esCentro(int destino) {
+        return destino >= NUM_SENSORES;
     }
     
     public static int getNUM_SENSORES() {
@@ -248,6 +272,27 @@ public class PracticaIAEstado {
         }
     }
     
+    public void debugPrintCentros() {
+        System.out.println("Informacion de los centros: ");
+        for (int i = 0; i < NUM_CENTROS; ++i) {
+            System.out.println("\tCentro " + i);
+            System.out.println("\tPosicion (X,Y): (" + 
+                    sensores.get(i).getCoordX() + "," + 
+                    sensores.get(i).getCoordY() + ")");
+        }
+    }
+    
+    public void debugPrintMatrizSensorACentro() {
+        System.out.println("Matriz de distancia sensor a centro: ");
+        for (int i = 0; i < NUM_SENSORES; ++i) {
+            System.out.print("\t");
+            for (int j = NUM_SENSORES; j < NUM_SENSORES + NUM_CENTROS; ++j) {
+                System.out.format("%.4f ", matrizDistanciasSensoresACentro[i][j-NUM_SENSORES]);
+            }
+            System.out.println();
+        }
+    }
+    
     private void debugPrintRed_i(int indice, int tab) {
         for (int i = 0; i < tab; ++i) {
             System.out.print("\t");
@@ -263,20 +308,10 @@ public class PracticaIAEstado {
         for (int i = 0; i < NUM_CENTROS; ++i) {
             System.out.println("##############################################");
             System.out.println("Centro " + i + ", tiene las siguientes conexiones: ");
-            for (Integer s : this.redCentros.get(i)) {
+            for (Integer s : this.redCentros.get(i + NUM_SENSORES)) {
                 debugPrintRed_i(s, 1);
             }
             System.out.println("##############################################");
         }
-    }
-
-    private boolean esCentro(int destino) {
-        return destino >= NUM_SENSORES;
-    }
-
-    
-
-    
-
-    
+    }    
 }
