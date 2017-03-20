@@ -37,15 +37,15 @@ public class PracticaIAEstado {
     private void calcularDistanciasEntreSensores(){
         for(int i = 0; i < NUM_SENSORES; ++i) {
             for(int j = 0; j < NUM_SENSORES; ++j) {
-                matrizDistanciasEntreSensores[i][j] = Math.pow(calcularDistancia(sensores.get(i), sensores.get(j)), 2.0);
+                matrizDistanciasEntreSensores[i][j] = calcularDistancia(sensores.get(i), sensores.get(j));
             }
         }
     }
     
     private void calcularDistanciasSensoresACentro() {
         for(int i = 0; i < NUM_SENSORES; ++i) {
-            for(int j = 0; j < NUM_SENSORES; ++j) {
-                matrizDistanciasSensoresACentro[i][j] = Math.pow(calcularDistancia(sensores.get(i), centros.get(j)), 2.0);
+            for(int j = 0; j < NUM_CENTROS; ++j) {
+                matrizDistanciasSensoresACentro[i][j] = calcularDistancia(sensores.get(i), centros.get(j));
             }
         }
     }
@@ -56,11 +56,17 @@ public class PracticaIAEstado {
         }
         
         for (int i = 0; i < NUM_CENTROS; ++i) {
-            this.redCentros.put(i, new HashSet<>());
+            this.redCentros.put(i + NUM_SENSORES, new HashSet<>());
         }
     }
     
-    public boolean comprovarGrafoAciclico() {
+    public boolean hayCiclos(int origen) {
+        int aux = origen;
+        while(!esCentro(sensorDestino[aux])){
+            aux = sensorDestino[aux];
+            if(aux == origen)
+                return true;
+        }
         return false;
     } 
     
@@ -135,18 +141,79 @@ public class PracticaIAEstado {
             ++i;
         }
     }
-    
-    public boolean movimientoValido(int sensorA, int sensorB) {
-        if (sensorA == sensorB) return false;
-        return true;
+    //conectar sensorA a sensorB
+    public boolean mover(int sensor, int destino){
+        //mirar si sensorA está conectado a un centro 
+        int destinoAnterior = sensorDestino[sensor];
+        sensorDestino[sensor] = destino;
+        
+        if(!movimientoValido(sensor))
+        {
+            return false;
+        }
+        else
+        {
+            desconectarSensorAEnB(sensor, destinoAnterior);
+            conectarSensorAEnB(sensor, destino);
+        }
+       return true;
     }
     
-    public boolean conexionesMaximasSensor(int indiceSensor) {
+    //intercambiar sensorA por sensorB y viceversa
+    public boolean intercambiar(int sensorA, int sensorB){
+        int destinoA = sensorDestino[sensorA];
+        return mover(sensorA, sensorDestino[sensorB]) 
+                && mover(sensorB, destinoA);
+    }
+    
+    private void desconectarSensorAEnB(int sensor, int destino) {
+        if(esCentro(destino))
+        {
+            this.redCentros.get(getCentroId(destino)).remove(sensor);
+        }
+        else
+        {
+            this.redSensores.get(destino).remove(sensor);
+        }
+    }
+    private void conectarSensorAEnB(int sensor, int destino) {
+        if(esCentro(destino))
+        {
+            this.redCentros.get(getCentroId(destino)).add(sensor);
+        }
+        else
+        {
+            this.redSensores.get(destino).add(sensor);
+        }
+    }
+   
+    
+    public boolean movimientoValido(int sensor) {
+        int destino = sensorDestino[sensor];
+        return aceptaConexion(destino) &&
+           !hayCiclos(destino);
+    }
+    
+    public int getCentroId(int indiceAbsoluto){
+        return indiceAbsoluto - NUM_SENSORES;
+    }
+    
+    public boolean sensorAceptaConexion(int indiceSensor) {
         return this.redSensores.get(indiceSensor).size() < MAX_CONEXIONES_SENSORES;        
     }
     
-    public boolean conexionesMaximasCentro(int indiceCentro) {
-        return this.redCentros.get(indiceCentro).size() < MAX_CONEXIONES_CENTROS;
+    public boolean centroAceptaConexion(int indiceCentro) {
+        return this.redCentros.get(getCentroId(indiceCentro)).size() < MAX_CONEXIONES_CENTROS;
+    }
+    private boolean aceptaConexion(int sensor) {
+        if(esCentro(sensor))
+        {
+            return centroAceptaConexion(sensor);
+        }
+        else
+        {
+            return sensorAceptaConexion(sensor);
+        }
     }
     
     public static int getNUM_SENSORES() {
@@ -202,4 +269,14 @@ public class PracticaIAEstado {
             System.out.println("##############################################");
         }
     }
+
+    private boolean esCentro(int destino) {
+        return destino >= NUM_SENSORES;
+    }
+
+    
+
+    
+
+    
 }

@@ -19,7 +19,7 @@ public class PracticaIA {
         
     public static void main(String[] args) {
         Sensores sensores = new Sensores(100, 1234);
-        CentrosDatos centrosDatos = new CentrosDatos(2, 1234);
+        CentrosDatos centrosDatos = new CentrosDatos(4, 1234);
         
         PracticaIAEstado estado = new PracticaIAEstado(sensores, centrosDatos);
         estado.generarEstadoInicial();
