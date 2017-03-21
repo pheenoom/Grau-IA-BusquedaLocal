@@ -9,6 +9,7 @@ import IA.Red.Centro;
 import IA.Red.CentrosDatos;
 import IA.Red.Sensor;
 import IA.Red.Sensores;
+import java.util.ArrayList;
 
 public class PracticaIA {
     public static void debug(PracticaIAEstado estado) {
@@ -18,6 +19,7 @@ public class PracticaIA {
         estado.debugPrintSensores();
         estado.debugPrintCentros();
         estado.debugPrintRed();
+        estado.debugPrintSensorDestino();
         System.out.println("\n\t\t########################## Fi Debug ##########################");
     }
         
@@ -75,7 +77,22 @@ public class PracticaIA {
         estado.generarEstadoInicial();        
         debug(estado);
         
+        ArrayList<Boolean> ciclos = new ArrayList<>();
+        for (int i = 0; i < PracticaIAEstado.NUM_SENSORES; ++i) {
+            ciclos.add(estado.hayCiclos(i));
+        }
         
+        boolean hayCiclo = false;
+        for (Boolean b : ciclos) {
+            if (b) hayCiclo = true;
+        }
+        
+        if (hayCiclo) {
+            System.out.println("Hay un ciclo!");
+        } 
+        else {
+            System.out.println("No hay ciclos!");
+        }
 
         
     }    

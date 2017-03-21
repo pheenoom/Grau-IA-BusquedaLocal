@@ -20,7 +20,7 @@ public class PracticaIASuccessorFunction implements SuccessorFunction{
     public List getSuccessors(Object o) {
         PracticaIAEstado estado = (PracticaIAEstado) o;
         ArrayList<PracticaIAEstado> estadosGenerados = new ArrayList<>();
-        
+        /*
         for (int indiceSensor = 0; indiceSensor < PracticaIAEstado.getNUM_SENSORES(); ++indiceSensor) {
             
             for (int destino = 0; destino < PracticaIAEstado.getNUM_SENSORES(); ++destino) {
@@ -40,7 +40,7 @@ public class PracticaIASuccessorFunction implements SuccessorFunction{
                     estadosGenerados.add(nuevoEstado);
                 }                
             }            
-        }
+        }*/
         
         return estadosGenerados;
     }

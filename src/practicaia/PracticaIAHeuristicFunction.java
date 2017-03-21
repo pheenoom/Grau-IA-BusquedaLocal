@@ -17,9 +17,7 @@ public class PracticaIAHeuristicFunction implements HeuristicFunction{
         
         double h = 0.0;
         
-        for (int i = 0; i < PracticaIAEstado.getNUM_CENTROS(); ++i) {
-                        
-        }
+        
         
         return h;        
     }

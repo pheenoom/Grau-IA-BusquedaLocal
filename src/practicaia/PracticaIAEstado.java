@@ -4,7 +4,6 @@ import IA.Red.Centro;
 import IA.Red.CentrosDatos;
 import IA.Red.Sensor;
 import IA.Red.Sensores;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -12,24 +11,22 @@ public class PracticaIAEstado {
     public static final int MAX_CONEXIONES_SENSORES = 3;
     public static final int MAX_CONEXIONES_CENTROS = 25;
     
-    private static int NUM_SENSORES;   
-    private static int NUM_CENTROS;
+    public static int NUM_SENSORES;   
+    public static int NUM_CENTROS;
     
     private static double[][] matrizDistanciasEntreSensores;
     private static double[][] matrizDistanciasSensoresACentro;
     private static CentrosDatos centros;
     private static Sensores sensores;
     
-    private int[] sensorDestino;
+    private int[] nodoDestinoSensor;
     private HashMap<Integer,HashSet<Integer>> redSensores;
     private HashMap<Integer,HashSet<Integer>> redCentros;
 
-    PracticaIAEstado(PracticaIAEstado estado) {
-        this.redSensores = PracticaIAEstado.copiaRed(estado.redSensores);
-        this.redCentros = PracticaIAEstado.copiaRed(estado.redCentros);
-        this.sensorDestino = estado.sensorDestino.clone();
-    }
-    
+    ////////////////////////////////////////////////////////////////////////////
+    ///                         Metodos privados                             ///
+    ////////////////////////////////////////////////////////////////////////////
+      
     private static HashMap<Integer, HashSet<Integer>> copiaRed(HashMap<Integer, HashSet<Integer>> original) {
         HashMap<Integer, HashSet<Integer>> copia = new HashMap<>();
         for (Integer key : original.keySet()) {
@@ -43,16 +40,32 @@ public class PracticaIAEstado {
         return copia;
     }
     
+    /**
+     * Coste: O(1).
+     * @param a != null.
+     * @param b != null.
+     * @return La distancia euclidea entre el sensor A y B.
+    */
     private double calcularDistancia(Sensor a, Sensor b) {
         return Math.sqrt(Math.pow(a.getCoordX() - b.getCoordX(), 2) 
                + Math.pow(a.getCoordY() - b.getCoordY(), 2));
     }
     
+    /**
+     * Coste: O(1).
+     * @param s != null.
+     * @param c != null.
+     * @return La distancia euclidea entre el sensor y el centro.
+     */
     private double calcularDistancia(Sensor s, Centro c) {
         return Math.sqrt(Math.pow(s.getCoordX() - c.getCoordX(), 2) 
                + Math.pow(s.getCoordY() - c.getCoordY(), 2));
     }
     
+    /**
+     * Coste: O(n^2), donde n es el numero de sensores.
+     * @return Calcula la matriz implicita de las distancias entre sensores.
+     */
     private void calcularDistanciasEntreSensores(){
         for(int i = 0; i < NUM_SENSORES; ++i) {
             for(int j = 0; j < NUM_SENSORES; ++j) {
@@ -61,14 +74,23 @@ public class PracticaIAEstado {
         }
     }
     
+    /**
+     * Coste: O(n^2), donde n = max(nSensores, nCentros).
+     * @return Calcula la matriz implicita de las distancias sensor a centros.
+     */    
     private void calcularDistanciasSensoresACentro() {
         for(int i = 0; i < NUM_SENSORES; ++i) {
             for(int j = 0; j < NUM_CENTROS; ++j) {
                 matrizDistanciasSensoresACentro[i][j] = calcularDistancia(sensores.get(i), centros.get(j));
             }
         }
-    }
+    }    
     
+    /**
+     * Coste: O(n * coste del new), donde n = max(nSensores, nCentros).
+     * @return Inicializa las red implicitas, tanto la de sensores como la de
+     * centros.
+     */
     private void inicializarRed() {
         for (int i = 0; i < NUM_SENSORES; ++i) {
             this.redSensores.put(i, new HashSet<>());
@@ -78,14 +100,116 @@ public class PracticaIAEstado {
             this.redCentros.put(i + NUM_SENSORES, new HashSet<>());
         }
     }
+            
+    /**
+     * Coste: O(1).
+     * @param destino NUM_SENSORES <= destino < NUM_CENTROS + NUM_SENSORES.
+     * @return Devuelve TRUE si el destino es un centro, sino lo contrario.
+     */
+    private boolean esCentro(int destino) {
+        return destino >= NUM_SENSORES;
+    }
     
+    /**
+     * Coste: O(n), donde n el numero de elementos que tiene el conjunto SET.
+     * @param sensor 0 <= sensor < NUM_SENSORES.
+     * @param destino 0 <= destino < NUM_SENSORES + NUM_CENTROS.
+     * @return Desconecta el sensor al nodo destino, este puede ser un sensor
+     * o un centro.
+     */
+    private void desconectarSensorAEnB(int sensor, int destino) {
+        if(esCentro(destino))
+        {
+            this.redCentros.get(getCentroId(destino)).remove(sensor);
+        }
+        else
+        {
+            this.redSensores.get(destino).remove(sensor);
+        }
+    }
+    
+    /**
+     * Coste: O(1).
+     * @param sensor 0 <= sensor < NUM_SENSORES.
+     * @param destino 0 <= destino < NUM_SENSORES + NUM_CENTROS.
+     * @return Conecta el sensor al nodo destino, este puede ser un sensor
+     * o un centro.
+     */
+    private void conectarSensorAEnB(int sensor, int destino) {
+        if(esCentro(destino))
+        {
+            this.redCentros.get(getCentroId(destino)).add(sensor);
+        }
+        else
+        {
+            this.redSensores.get(destino).add(sensor);
+        }
+    }
+   
+    /**
+     * Coste: O(1).
+     * @param 0 <= destino < NUM_SENSORES + NUM_CENTROS.
+     * @return Devuelve TRUE si el nodo destino aun tiene conexiones libres,
+     * sino devuelve FALSE.
+     */
+    private boolean aceptaConexion(int destino) {
+        if(esCentro(destino)) {
+            return centroAceptaConexion(destino);
+        }
+        else {
+            return sensorAceptaConexion(destino);
+        }
+    }
+    
+    ////////////////////////////////////////////////////////////////////////////
+    ///                            Constructor                               ///
+    ////////////////////////////////////////////////////////////////////////////
+    
+    PracticaIAEstado(PracticaIAEstado estado) {
+        this.redSensores = PracticaIAEstado.copiaRed(estado.redSensores);
+        this.redCentros = PracticaIAEstado.copiaRed(estado.redCentros);
+        this.nodoDestinoSensor = estado.nodoDestinoSensor.clone();
+    }
+    
+     public PracticaIAEstado(Sensores sensores, CentrosDatos centros) {
+        NUM_SENSORES = sensores.size();
+        NUM_CENTROS = centros.size();
+        
+        this.centros = centros;
+        this.sensores = sensores;
+        
+        this.redSensores = new HashMap<>();
+        this.redCentros = new HashMap<>();
+        inicializarRed();
+        
+        this.nodoDestinoSensor = new int[NUM_SENSORES];      
+        
+        matrizDistanciasEntreSensores = new double[NUM_SENSORES][NUM_SENSORES];
+        calcularDistanciasEntreSensores();
+        
+        matrizDistanciasSensoresACentro = new double[NUM_SENSORES][NUM_CENTROS];
+        calcularDistanciasSensoresACentro();
+    }
+    
+    ////////////////////////////////////////////////////////////////////////////
+    ///                         Metodos publicos                             ///
+    ////////////////////////////////////////////////////////////////////////////
+    
+    /**
+     * Coste: O(n), donde N es la longitud del ciclo.
+     * @param 0 <= origen < NUM_SENSORES.
+     * @return Devuelve TRUE si a partir de la posicion origen puede llegar a un
+     * Centro.
+     */
     public boolean hayCiclos(int origen) {
         int aux = origen;
-        while(!esCentro(sensorDestino[aux])){
-            aux = sensorDestino[aux];
+        
+        while(!esCentro(nodoDestinoSensor[aux])){
+            aux = nodoDestinoSensor[aux];
             if(aux == origen)
                 return true;
         }
+        
         return false;
     } 
         
@@ -112,33 +236,17 @@ public class PracticaIAEstado {
         return distancia;
     }
     
-    public PracticaIAEstado(Sensores sensores, CentrosDatos centros) {
-        NUM_SENSORES = sensores.size();
-        NUM_CENTROS = centros.size();
-        
-        this.centros = centros;
-        this.sensores = sensores;
-        this.redSensores = new HashMap<>();
-        this.redCentros = new HashMap<>();
-        inicializarRed();
-        
-        this.sensorDestino = new int[NUM_SENSORES];
-        Arrays.fill(sensorDestino, -1);        
-        
-        matrizDistanciasEntreSensores = new double[NUM_SENSORES][NUM_SENSORES];
-        calcularDistanciasEntreSensores();
-        
-        matrizDistanciasSensoresACentro = new double[NUM_SENSORES][NUM_CENTROS];
-        calcularDistanciasSensoresACentro();
-    }
-        
+    /**
+     * Coste: O(n), donde n = NUM_SENSORES.
+     */
     public void generarEstadoInicial() {
         int indiceSensor = 0;
         int indiceCentro = 0;
         while (indiceSensor < NUM_SENSORES && aceptaConexion(NUM_SENSORES + NUM_CENTROS - 1)) {            
             this.redCentros.get(indiceCentro + NUM_SENSORES).add(indiceSensor);
+            this.nodoDestinoSensor[indiceSensor] = indiceCentro + NUM_SENSORES;            
             
-            ++indiceSensor;
+            ++indiceSensor;            
             indiceCentro = ++indiceCentro % NUM_CENTROS;
         }
         
@@ -153,6 +261,7 @@ public class PracticaIAEstado {
             
             i = (i % (offset * j)) + ((j == 1) ? 0 : offset * (j/3));
             
+            this.nodoDestinoSensor[i] = indiceSensor;
             this.redSensores.get(i).add(indiceSensor);
             
             ++indiceSensor;
@@ -160,10 +269,9 @@ public class PracticaIAEstado {
         }
     }
     
-    //conectar sensorA a sensorB
     public boolean mover(int sensor, int destino) {        
-        int destinoAnterior = sensorDestino[sensor];
-        sensorDestino[sensor] = destino;
+        int destinoAnterior = nodoDestinoSensor[sensor];
+        nodoDestinoSensor[sensor] = destino;
         
         if(!movimientoValido(sensor))
         {
@@ -178,37 +286,14 @@ public class PracticaIAEstado {
        return true;
     }
     
-    //intercambiar sensorA por sensorB y viceversa
     public boolean intercambiar(int sensorA, int sensorB){
-        int destinoA = sensorDestino[sensorA];
-        return mover(sensorA, sensorDestino[sensorB]) 
+        int destinoA = nodoDestinoSensor[sensorA];
+        return mover(sensorA, nodoDestinoSensor[sensorB]) 
                 && mover(sensorB, destinoA);
     }
     
-    private void desconectarSensorAEnB(int sensor, int destino) {
-        if(esCentro(destino))
-        {
-            this.redCentros.get(getCentroId(destino)).remove(sensor);
-        }
-        else
-        {
-            this.redSensores.get(destino).remove(sensor);
-        }
-    }
-    private void conectarSensorAEnB(int sensor, int destino) {
-        if(esCentro(destino))
-        {
-            this.redCentros.get(getCentroId(destino)).add(sensor);
-        }
-        else
-        {
-            this.redSensores.get(destino).add(sensor);
-        }
-    }
-   
-    
     public boolean movimientoValido(int sensor) {
-        int destino = sensorDestino[sensor];
+        int destino = nodoDestinoSensor[sensor];
         return aceptaConexion(destino) &&
            !hayCiclos(destino);
     }
@@ -224,31 +309,10 @@ public class PracticaIAEstado {
     public boolean centroAceptaConexion(int indiceCentro) {
         return this.redCentros.get(indiceCentro).size() < MAX_CONEXIONES_CENTROS;
     }
-    
-    private boolean aceptaConexion(int sensor) {
-        if(esCentro(sensor))
-        {
-            return centroAceptaConexion(sensor);
-        }
-        else
-        {
-            return sensorAceptaConexion(sensor);
-        }
-    }
-        
-    private boolean esCentro(int destino) {
-        return destino >= NUM_SENSORES;
-    }
-    
-    public static int getNUM_SENSORES() {
-        return NUM_SENSORES;
-    }
 
-    public static int getNUM_CENTROS() {
-        return NUM_CENTROS;
-    }
-
-    /// Metodos Debug
+    ////////////////////////////////////////////////////////////////////////////
+    ///                          Metodos DEBUG                               ///
+    ////////////////////////////////////////////////////////////////////////////
     
     public void debugPrintMatrizDistancias() {
         System.out.println();
@@ -350,5 +414,19 @@ public class PracticaIAEstado {
             }
             System.out.println("##############################################");
         }
-    }    
+    }
+    
+    public void debugPrintSensorDestino() {
+        System.out.println();
+        System.out.println("Informacion de los nodos destino de los sensores");
+        for (int i = 0; i < NUM_SENSORES; ++i) {
+            System.out.print("S" + (i + 1) + " --> ");
+            if (esCentro(this.nodoDestinoSensor[i])) {
+                System.out.println("C" + (this.nodoDestinoSensor[i] - NUM_SENSORES + 1));
+            }
+            else {                
+                System.out.println("S" + this.nodoDestinoSensor[i]);
+            }
+        }
+    }
 }
