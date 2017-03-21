@@ -251,9 +251,25 @@ public class PracticaIAEstado {
     /// Metodos Debug
     
     public void debugPrintMatrizDistancias() {
+        System.out.println();
         System.out.println("Matriz de distancias entre sensores: ");
+        System.out.print("\t ");
         for (int i = 0; i < NUM_SENSORES; ++i) {
-            System.out.print("\t");
+            if ((i+1) > 9) {
+                System.out.print("S" + (i+1) + "    ");
+            }
+            else 
+            {
+                System.out.print("S" + (i+1) + "     ");
+            }
+        }
+        System.out.println();
+        for (int i = 0; i < 100; ++i) {
+            System.out.print("-");
+        }
+        System.out.println();
+        for (int i = 0; i < NUM_SENSORES; ++i) {
+            System.out.print("S" + (i + 1) + "\t|");
             for (int j = 0; j < NUM_SENSORES; ++j) {
                 System.out.format("%.4f ", matrizDistanciasEntreSensores[i][j]);
             }
@@ -261,34 +277,54 @@ public class PracticaIAEstado {
         }
     }
     
+    public void debugPrintMatrizSensorACentro() {   
+        System.out.println();     
+        System.out.println("Matriz de distancias sensores a centros: ");
+        System.out.print("\t ");
+        for (int i = 0; i < NUM_CENTROS; ++i) {
+            if ((i+1) > 9) {
+                System.out.print("C" + (i+1) + "    ");
+            }
+            else 
+            {
+                System.out.print("C" + (i+1) + "     ");
+            }
+        }
+        System.out.println();
+        for (int i = 0; i < 100; ++i) {
+            System.out.print("-");
+        }
+        System.out.println();
+        for (int i = 0; i < NUM_SENSORES; ++i) {
+            System.out.print("S" + (i + 1) + "\t|");
+            for (int j = NUM_SENSORES; j < NUM_SENSORES + NUM_CENTROS; ++j) {
+                System.out.format("%.4f ", matrizDistanciasSensoresACentro[i][j-NUM_SENSORES]);
+            }
+            System.out.println();
+        }
+    }
+    
     public void debugPrintSensores() {
+        System.out.println();
         System.out.println("Informacion de los sensores: ");
         for (int i = 0; i < NUM_SENSORES; ++i) {
-            System.out.println("\tSensor " + i);
+            System.out.println("\tSensor " + (i + 1));
             System.out.println("\tCapacidad: " + sensores.get(i).getCapacidad());
             System.out.println("\tPosicion (X,Y): (" + 
                     sensores.get(i).getCoordX() + "," + 
                     sensores.get(i).getCoordY() + ")");
+            System.out.println();
         }
     }
     
     public void debugPrintCentros() {
+        System.out.println();
         System.out.println("Informacion de los centros: ");
         for (int i = 0; i < NUM_CENTROS; ++i) {
-            System.out.println("\tCentro " + i);
+            System.out.println("\tCentro " + (i + 1));
             System.out.println("\tPosicion (X,Y): (" + 
-                    sensores.get(i).getCoordX() + "," + 
-                    sensores.get(i).getCoordY() + ")");
-        }
-    }
-    
-    public void debugPrintMatrizSensorACentro() {
-        System.out.println("Matriz de distancia sensor a centro: ");
-        for (int i = 0; i < NUM_SENSORES; ++i) {
-            System.out.print("\t");
-            for (int j = NUM_SENSORES; j < NUM_SENSORES + NUM_CENTROS; ++j) {
-                System.out.format("%.4f ", matrizDistanciasSensoresACentro[i][j-NUM_SENSORES]);
-            }
+                    centros.get(i).getCoordX() + "," + 
+                    centros.get(i).getCoordY() + ")");
             System.out.println();
         }
     }
@@ -297,17 +333,18 @@ public class PracticaIAEstado {
         for (int i = 0; i < tab; ++i) {
             System.out.print("\t");
         }
-        System.out.println("Sensor " + indice + ": ");
+        System.out.println("Sensor " + (indice + 1) + ": ");
         for (Integer s : this.redSensores.get(indice)) {
             debugPrintRed_i(s,++tab);
         }
     }
     
     public void debugPrintRed() {
+        System.out.println();
         System.out.println("Informacion de la red: ");
         for (int i = 0; i < NUM_CENTROS; ++i) {
             System.out.println("##############################################");
-            System.out.println("Centro " + i + ", tiene las siguientes conexiones: ");
+            System.out.println("Centro " + (i + 1) + ", tiene las siguientes conexiones: ");
             for (Integer s : this.redCentros.get(i + NUM_SENSORES)) {
                 debugPrintRed_i(s, 1);
             }
