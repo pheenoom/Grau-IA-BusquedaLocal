@@ -120,7 +120,7 @@ public class PracticaIAEstado {
     private void desconectarSensorAEnB(int sensor, int destino) {
         if(esCentro(destino))
         {
-            this.redCentros.get(getCentroId(destino)).remove(sensor);
+            this.redCentros.get(destino).remove(sensor);
         }
         else
         {
@@ -138,7 +138,7 @@ public class PracticaIAEstado {
     private void conectarSensorAEnB(int sensor, int destino) {
         if(esCentro(destino))
         {
-            this.redCentros.get(getCentroId(destino)).add(sensor);
+            this.redCentros.get(destino).add(sensor);
         }
         else
         {
@@ -212,7 +212,28 @@ public class PracticaIAEstado {
         
         return false;
     } 
+    
+    /**
+     * Coste: 
+     * @param sensor
+     * @param destino
+     * @return 
+     */
+    public boolean mover(int sensor, int destino) {        
+        int destinoAnterior = nodoDestinoSensor[sensor];
+        nodoDestinoSensor[sensor] = destino;
         
+        if(!movimientoValido(sensor)) {
+            return false;
+        }
+        else {
+            desconectarSensorAEnB(sensor, destinoAnterior);
+            conectarSensorAEnB(sensor, destino);
+        }
+        
+       return true;
+    }
+    
     public double calcularDistanciaSubArbolSensor(int indiceSensor) {
         double distancia = 0.0;
         
@@ -268,24 +289,7 @@ public class PracticaIAEstado {
             ++i;
         }
     }
-    
-    public boolean mover(int sensor, int destino) {        
-        int destinoAnterior = nodoDestinoSensor[sensor];
-        nodoDestinoSensor[sensor] = destino;
         
-        if(!movimientoValido(sensor))
-        {
-            return false;
-        }
-        else
-        {
-            desconectarSensorAEnB(sensor, destinoAnterior);
-            conectarSensorAEnB(sensor, destino);
-        }
-        
-       return true;
-    }
-    
     public boolean intercambiar(int sensorA, int sensorB){
         int destinoA = nodoDestinoSensor[sensorA];
         return mover(sensorA, nodoDestinoSensor[sensorB]) 
@@ -425,7 +429,7 @@ public class PracticaIAEstado {
                 System.out.println("C" + (this.nodoDestinoSensor[i] - NUM_SENSORES + 1));
             }
             else {                
-                System.out.println("S" + this.nodoDestinoSensor[i]);
+                System.out.println("S" + (this.nodoDestinoSensor[i] + 1));
             }
         }
     }
