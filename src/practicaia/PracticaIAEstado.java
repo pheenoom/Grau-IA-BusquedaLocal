@@ -278,11 +278,60 @@ public class PracticaIAEstado {
             
             i = (i % (offset * j)) + ((j == 1) ? 0 : offset * (j/3));
             
-            this.nodoDestinoSensor[i] = indiceSensor;
+            this.nodoDestinoSensor[indiceSensor] = i;
             this.redSensores.get(i).add(indiceSensor);
             
             ++indiceSensor;
             ++i;
+        }
+    }
+    
+    public void generarEstadoInicialMejorado() {
+        int indiceSensor = 0;
+        int indiceCentro = 0;
+        while (indiceSensor < NUM_SENSORES && aceptaConexion(NUM_SENSORES + NUM_CENTROS - 1)) {            
+            this.redCentros.get(indiceCentro + NUM_SENSORES).add(indiceSensor);
+            this.nodoDestinoSensor[indiceSensor] = indiceCentro + NUM_SENSORES;            
+            
+            ++indiceSensor;            
+            indiceCentro = ++indiceCentro % NUM_CENTROS;
+        }
+        int offset = NUM_CENTROS * MAX_CONEXIONES_CENTROS;
+        int j = 1;
+        int i = 0;
+        while (indiceSensor < NUM_SENSORES) {
+            if (this.redSensores.get(offset * j).size() >= MAX_CONEXIONES_SENSORES) {
+                j = j * MAX_CONEXIONES_SENSORES;
+            }
+            
+            i = (i % (offset * j)) + ((j == 1) ? 0 : offset * (j/3));
+            
+           RecolocaSensor(i,indiceSensor);
+            
+            
+            ++indiceSensor;
+            ++i;
+        }
+    }
+    public boolean PadreSuperior(int padre, int hijo){
+        if(sensores.get(padre).getCapacidad() > sensores.get(hijo).getCapacidad()){
+            return true;
+        }
+        return false;
+    }
+    public void RecolocaSensor(int padre, int hijo){
+        while(!PadreSuperior(padre, hijo) || esCentro(padre)){
+            intercambiar(padre, hijo);
+            hijo = padre;
+            padre = nodoDestinoSensor[hijo];
+        }
+        if(esCentro(padre)){
+            this.redCentros.get(padre + NUM_SENSORES).add(hijo);
+            this.nodoDestinoSensor[hijo] = padre + NUM_SENSORES; 
+        }
+        else{
+            this.nodoDestinoSensor[hijo] = padre;
+            this.redSensores.get(padre).add(hijo);  
         }
     }
         
