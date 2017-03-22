@@ -118,12 +118,10 @@ public class PracticaIAEstado {
      * o un centro.
      */
     private void desconectarSensorAEnB(int sensor, int destino) {
-        if(esCentro(destino))
-        {
+        if(esCentro(destino)) {
             this.redCentros.get(destino).remove(sensor);
         }
-        else
-        {
+        else {
             this.redSensores.get(destino).remove(sensor);
         }
     }
@@ -136,12 +134,10 @@ public class PracticaIAEstado {
      * o un centro.
      */
     private void conectarSensorAEnB(int sensor, int destino) {
-        if(esCentro(destino))
-        {
+        if(esCentro(destino)) {
             this.redCentros.get(destino).add(sensor);
         }
-        else
-        {
+        else {
             this.redSensores.get(destino).add(sensor);
         }
     }
@@ -312,6 +308,26 @@ public class PracticaIAEstado {
     
     public boolean centroAceptaConexion(int indiceCentro) {
         return this.redCentros.get(indiceCentro).size() < MAX_CONEXIONES_CENTROS;
+    }    
+    
+    Sensores getSensores(){
+        return sensores;
+    }
+    
+    HashMap<Integer,HashSet<Integer>> getRedSensores(){
+        return redSensores;
+    }
+    
+    HashMap<Integer,HashSet<Integer>> getRedCentros(){
+        return redCentros;
+    }
+    
+    public double getDistanciaEntreSensores(int a, int b) {
+        return matrizDistanciasEntreSensores[a][b];        
+    }
+    
+    public double getDistanciaSensorACentro(int s, int c) {
+        return matrizDistanciasSensoresACentro[s][c];
     }
 
     ////////////////////////////////////////////////////////////////////////////

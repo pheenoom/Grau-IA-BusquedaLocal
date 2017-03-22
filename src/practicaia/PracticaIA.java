@@ -12,7 +12,9 @@ import IA.Red.Sensores;
 import java.util.ArrayList;
 
 public class PracticaIA {
-    public static void debug(PracticaIAEstado estado) {
+    public static PracticaIAEstado estado;
+    
+    public static void debug() {
         System.out.println("\t\t########################## Debug ##########################\n");
         estado.debugPrintMatrizDistancias();
         estado.debugPrintMatrizSensorACentro();
@@ -22,19 +24,32 @@ public class PracticaIA {
         estado.debugPrintSensorDestino();
         System.out.println("\n\t\t########################## Fi Debug ##########################");
     }
+    
+    public static void debugHyaCiclos() {
+        ArrayList<Boolean> ciclos = new ArrayList<>();
+        
+        for (int i = 0; i < PracticaIAEstado.NUM_SENSORES; ++i) {
+            ciclos.add(estado.hayCiclos(i));
+        }
+        
+        boolean hayCiclo = false;
+        for (Boolean b : ciclos) {
+            if (b) hayCiclo = true;
+        }
+        
+        if (hayCiclo) {
+            System.out.println("Hay un ciclo!");
+        } 
+        else {
+            System.out.println("No hay ciclos!");
+        }    
+    }
+    
+    public static void prueba(Double d) {
+        d = 1.0;
+    }
         
     public static void main(String[] args) {
-        //Sensores sensores = new Sensores(2, 43243244);
-        //CentrosDatos centrosDatos = new CentrosDatos(1, 435);
-        
-        //PracticaIAEstado estado = new PracticaIAEstado(sensores, centrosDatos);
-        //estado.generarEstadoInicial();
-        //System.out.println("Distancia: " + estado.calcularDistanciaCentroIessimo(0));
-        //debug(estado);
- 
-        // Bateria de pruebas de clase
-        
-        
         Sensor s1 = new Sensor(10, 3, 1);
         Sensor s2 = new Sensor(4, 6, 1);
         Sensor s3 = new Sensor(2, 8, 0);
@@ -72,27 +87,19 @@ public class PracticaIA {
         centrosDatos.add(c2);
         centrosDatos.add(c3);
         
-        PracticaIAEstado estado = new PracticaIAEstado(sensores, centrosDatos);
+        estado = new PracticaIAEstado(sensores, centrosDatos);
         
-        estado.generarEstadoInicial();        
-        debug(estado);
+        estado.generarEstadoInicial();
+        debug();
         
-        ArrayList<Boolean> ciclos = new ArrayList<>();
-        for (int i = 0; i < PracticaIAEstado.NUM_SENSORES; ++i) {
-            ciclos.add(estado.hayCiclos(i));
-        }
         
-        boolean hayCiclo = false;
-        for (Boolean b : ciclos) {
-            if (b) hayCiclo = true;
-        }
+        Double prueba = 0.0;
+        prueba(prueba);
+        System.out.println("Valor: " + prueba);
         
-        if (hayCiclo) {
-            System.out.println("Hay un ciclo!");
-        } 
-        else {
-            System.out.println("No hay ciclos!");
-        }
+        //debug();
+        
+        
 
         
     }    
