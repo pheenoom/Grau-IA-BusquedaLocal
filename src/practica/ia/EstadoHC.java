@@ -231,12 +231,18 @@ public class EstadoHC{
         
         return true;
     }
-    /*    
+    
     public boolean intercambiar(int sensorA, int sensorB){
         int destinoA = nodoDestinoSensor[sensorA];
-        return mover(sensorA, nodoDestinoSensor[sensorB]) 
-                && mover(sensorB, destinoA);
-    }*/
+        byte tipoDestinoA = tipoNodoDestinoSensor[sensorA];
+        
+        this.nodoDestinoSensor[sensorA] = this.nodoDestinoSensor[sensorB];
+        this.tipoNodoDestinoSensor[sensorA] = this.tipoNodoDestinoSensor[sensorB];
+        this.nodoDestinoSensor[sensorB] = destinoA;
+        this.tipoNodoDestinoSensor[sensorB] = tipoDestinoA;
+        
+        return !hayCiclos(sensorA) && !hayCiclos(sensorB);
+    }
     
     public boolean movimientoValido(int sensor) {
         int destino = nodoDestinoSensor[sensor];

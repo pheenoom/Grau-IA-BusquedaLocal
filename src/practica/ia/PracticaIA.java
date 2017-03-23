@@ -241,8 +241,17 @@ public class PracticaIA {
         centrosDatos.add(c2);
         centrosDatos.add(c3);
         
+        // Ejemplo de prueba
+        //estado = new EstadoHC(sensores, centrosDatos);
+        //estado.generarEstadoInicial();
+        
+        // Ejemplo normal
+        sensores = new Sensores(100, 1234);
+        centrosDatos = new CentrosDatos(4, 1234);
         estado = new EstadoHC(sensores, centrosDatos);
         estado.generarEstadoInicial();
+        
+        
         debug();
         
         Problem problem = new Problem(  estado, 
