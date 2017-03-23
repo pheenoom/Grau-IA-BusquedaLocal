@@ -206,8 +206,10 @@ public class EstadoHC{
         nodoDestinoSensor[sensor] = destino;
         tipoNodoDestinoSensor[sensor] = tipoDestino;
         
-        if(tipoDestino == 'S' && (!sensorAceptaConexion(sensor) || !hayCiclos(destino))) {
-            return false;
+        if(tipoDestino == 'S'){
+            if(!sensorAceptaConexion(sensor) || hayCiclos(destino)) {
+                return false;
+            }
         }
         else {
             if (!centroAceptaConexion(destino)) {
@@ -233,6 +235,7 @@ public class EstadoHC{
     }
     
     public boolean intercambiar(int sensorA, int sensorB){
+        /*
         int destinoA = nodoDestinoSensor[sensorA];
         byte tipoDestinoA = tipoNodoDestinoSensor[sensorA];
         
