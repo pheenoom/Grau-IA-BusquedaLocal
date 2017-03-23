@@ -1,4 +1,4 @@
-package practicaia;
+package practica.ia;
 
 import aima.search.framework.HeuristicFunction;
 
@@ -6,8 +6,8 @@ import aima.search.framework.HeuristicFunction;
  *
  * @author Ruben Bagan Benavides, Marta Barroso Isidro, Gerard del Castillo Lite
  */
-public class PracticaIAHeuristicFunction implements HeuristicFunction {
-    private static PracticaIAEstado estado;
+public class HeuristicFunctionHC implements HeuristicFunction {
+    private static EstadoHC estado;
     private class VecCTP {
         public double c;
         public double t;
@@ -23,9 +23,9 @@ public class PracticaIAHeuristicFunction implements HeuristicFunction {
             this.p += v.p;
         }
     }
-    
-   //el valor de transmitido es el volumen de datos transmitido por el nodo hijo
-   void calcularTransmitido(int padre, VecCTP vecCTP){
+   
+    //el valor de transmitido es el volumen de datos transmitido por el nodo hijo
+    void calcularTransmitido(int padre, VecCTP vecCTP){
         int capPadre = (int) estado.getSensores().get(padre).getCapacidad();
         if(vecCTP.t <= capPadre){
             vecCTP.t += capPadre * 1.5;
@@ -56,7 +56,7 @@ public class PracticaIAHeuristicFunction implements HeuristicFunction {
     
     @Override
     public double getHeuristicValue(Object o) {        
-        estado = (PracticaIAEstado) o;
+        estado = (EstadoHC) o;
         
         // La primera version del heuristico calculara el coste en función unicamente
         // de la distancia.
@@ -80,6 +80,6 @@ public class PracticaIAHeuristicFunction implements HeuristicFunction {
             }            
         }
         
-        return global.c;        
+        return global.c;
     }
 }

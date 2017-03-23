@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package practicaia;
+package practica.ia;
 
 import aima.search.framework.GoalTest;
 
@@ -12,7 +12,7 @@ import aima.search.framework.GoalTest;
  *
  * @author Ruben Bagan Benavides, Marta Barroso Isidro, Gerard del Castillo Lite
  */
-public class PracticaIAGoalTest implements GoalTest{
+public class GoalTestHC implements GoalTest{
 
     @Override
     public boolean isGoalState(Object o) {
