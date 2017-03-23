@@ -204,6 +204,7 @@ public class PracticaIA {
     
     
     public static void main(String[] args) {
+        /*
         Sensor s1 = new Sensor(10, 3, 1);
         Sensor s2 = new Sensor(4, 6, 1);
         Sensor s3 = new Sensor(2, 8, 0);
@@ -252,6 +253,20 @@ public class PracticaIA {
         estado.generarEstadoInicial();
         
         
+        debug();*/
+        
+        /*
+        Sensor s1 = new Sensor(10, 3, 1);
+        Sensor s2 = new Sensor(2, 3, 1);
+        Centro c1 = new Centro(2, 5);
+        sensores = new Sensores(0,1);
+        centrosDatos = new CentrosDatos(0,1);
+        sensores.add(s1);
+        sensores.add(s2);
+        centrosDatos.add(c1);
+        estado = new EstadoHC(sensores, centrosDatos);
+        estado.generarEstadoInicial();
+        estado.mover(0, 1, (byte)'S');
         debug();
         
         Problem problem = new Problem(  estado, 
@@ -268,5 +283,29 @@ public class PracticaIA {
         } catch (Exception ex) {
             Logger.getLogger(PracticaIA.class.getName()).log(Level.SEVERE, null, ex);
         }
+        */
+        
+        sensores = new Sensores(10, 1234);
+        centrosDatos = new CentrosDatos(1, 1234);
+        estado = new EstadoHC(sensores, centrosDatos);
+        estado.generarEstadoInicial();
+        
+        
+        debug();
+        Problem problem = new Problem(  estado, 
+                                        new SuccessorFunctionHC(), 
+                                        new GoalTestHC(),
+                                        new HeuristicFunctionHC());
+        
+        HillClimbingSearch search = new HillClimbingSearch();
+        try {
+            SearchAgent agent = new SearchAgent(problem, search);  
+            
+            printActions(agent.getActions());
+            printInstrumentation(agent.getInstrumentation());
+        } catch (Exception ex) {
+            Logger.getLogger(PracticaIA.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }    
 }
