@@ -19,10 +19,10 @@ public class EstadoHC{
     private static CentrosDatos centros;
     private static Sensores sensores;
     
-    private int[] nodoDestinoSensor;
-    private byte[] tipoNodoDestinoSensor;
-    private HashMap<Integer,HashSet<Integer>> redSensores;
-    private HashMap<Integer,HashSet<Integer>> redCentros;
+    private int[] destinos;
+    private byte[] tipos;
+    private HashMap<Integer,HashSet<Integer>> hijosSensores;
+    private HashMap<Integer,HashSet<Integer>> hijosCentros;
 
     ////////////////////////////////////////////////////////////////////////////
     ///                         Metodos privados                             ///
@@ -55,41 +55,41 @@ public class EstadoHC{
     }    
     
     private void desconectarSensorAEnSesnsorB(int a, int b) {
-        this.redSensores.get(b).remove(a);
-        this.nodoDestinoSensor[a] = -1;
-        this.tipoNodoDestinoSensor[a] = '-';
+        this.hijosSensores.get(b).remove(a);
+        this.destinos[a] = -1;
+        this.tipos[a] = '-';
     }
     
     private void desconectarSensorEnCentro(int s, int c) {
-        this.redCentros.get(c).remove(s);
-        this.nodoDestinoSensor[s] = -1;
-        this.tipoNodoDestinoSensor[s] = '-';
+        this.hijosCentros.get(c).remove(s);
+        this.destinos[s] = -1;
+        this.tipos[s] = '-';
     }
     
     private void conectarSensorAEnSensorB(int a, int b) {
-        this.redSensores.get(b).add(a);
-        this.nodoDestinoSensor[a] = b;
-        this.tipoNodoDestinoSensor[a] = 'S';
+        this.hijosSensores.get(b).add(a);
+        this.destinos[a] = b;
+        this.tipos[a] = 'S';
     }
     
     private void conectarSensorEnCentro(int s, int c) {
-        this.redSensores.get(c).add(s);
-        this.nodoDestinoSensor[s] = c;
-        this.tipoNodoDestinoSensor[s] = 'C';
+        this.hijosSensores.get(c).add(s);
+        this.destinos[s] = c;
+        this.tipos[s] = 'C';
     }
     
     private void inicializarRed() {
         for (int i = 0; i < NUM_SENSORES; ++i) {
-            this.redSensores.put(i, new HashSet<>());
+            this.hijosSensores.put(i, new HashSet<>());
         }       
         
         for (int i = 0; i < NUM_CENTROS; ++i) {
-            this.redCentros.put(i, new HashSet<>());
+            this.hijosCentros.put(i, new HashSet<>());
         }
     }
     
     private boolean esCentro(int indice) {
-        return tipoNodoDestinoSensor[indice] == 'C';
+        return tipos[indice] == 'C';
     }
     
     ////////////////////////////////////////////////////////////////////////////
@@ -97,10 +97,10 @@ public class EstadoHC{
     ////////////////////////////////////////////////////////////////////////////
     
     EstadoHC(EstadoHC estado) {
-        this.redSensores = estado.copiaRedSensores();
-        this.redCentros = estado.copiaRedCentros();
-        this.nodoDestinoSensor = estado.nodoDestinoSensor.clone();
-        this.tipoNodoDestinoSensor = estado.tipoNodoDestinoSensor.clone();
+        this.hijosSensores = estado.copiaRedSensores();
+        this.hijosCentros = estado.copiaRedCentros();
+        this.destinos = estado.destinos.clone();
+        this.tipos = estado.tipos.clone();
     }
     
     public EstadoHC(Sensores sensores, CentrosDatos centros) {
@@ -110,12 +110,12 @@ public class EstadoHC{
         this.centros = centros;
         this.sensores = sensores;
         
-        this.redSensores = new HashMap<>();
-        this.redCentros = new HashMap<>();
+        this.hijosSensores = new HashMap<>();
+        this.hijosCentros = new HashMap<>();
         inicializarRed();
         
-        this.nodoDestinoSensor = new int[NUM_SENSORES];
-        this.tipoNodoDestinoSensor = new byte[NUM_SENSORES];
+        this.destinos = new int[NUM_SENSORES];
+        this.tipos = new byte[NUM_SENSORES];
         
         matrizDistanciasEntreSensores = new double[NUM_SENSORES][NUM_SENSORES];
         calcularDistanciasEntreSensores();
@@ -130,10 +130,10 @@ public class EstadoHC{
    
     public final HashMap<Integer, HashSet<Integer>> copiaRedSensores() {
         HashMap<Integer, HashSet<Integer>> copia = new HashMap<>();
-        for (Integer key : this.redSensores.keySet()) {
+        for (Integer key : this.hijosSensores.keySet()) {
             copia.put(key, new HashSet<>());
             
-            for (Integer value : this.redSensores.get(key)) {
+            for (Integer value : this.hijosSensores.get(key)) {
                 copia.get(key).add(value);
             }            
         }
@@ -143,10 +143,10 @@ public class EstadoHC{
     
     public final HashMap<Integer, HashSet<Integer>> copiaRedCentros() {
         HashMap<Integer, HashSet<Integer>> copia = new HashMap<>();
-        for (Integer key : this.redCentros.keySet()) {
+        for (Integer key : this.hijosCentros.keySet()) {
             copia.put(key, new HashSet<>());
             
-            for (Integer value : this.redCentros.get(key)) {
+            for (Integer value : this.hijosCentros.get(key)) {
                 copia.get(key).add(value);
             }            
         }
@@ -158,9 +158,9 @@ public class EstadoHC{
         int indiceSensor = 0;
         int indiceCentro = 0;
         while (indiceSensor < NUM_SENSORES && aceptaConexion(NUM_CENTROS - 1)) {            
-            this.redCentros.get(indiceCentro).add(indiceSensor);
-            this.nodoDestinoSensor[indiceSensor] = indiceCentro;
-            this.tipoNodoDestinoSensor[indiceSensor] = 'C';
+            this.hijosCentros.get(indiceCentro).add(indiceSensor);
+            this.destinos[indiceSensor] = indiceCentro;
+            this.tipos[indiceSensor] = 'C';
             
             ++indiceSensor;            
             indiceCentro = (++indiceCentro) % NUM_CENTROS;
@@ -171,16 +171,16 @@ public class EstadoHC{
         int padre = 0;
         
         while (indiceSensor < NUM_SENSORES) {
-            if (this.redSensores.get(offset * j).size() >= MAX_CONEXIONES_SENSORES) {
+            if (this.hijosSensores.get(offset * j).size() >= MAX_CONEXIONES_SENSORES) {
                 j = j * MAX_CONEXIONES_SENSORES;
             }
             
             padre = (padre % (offset * j)) + ((j == 1) ? 0 : offset * (j/3));
             
-            this.nodoDestinoSensor[indiceSensor] = padre;
-            this.tipoNodoDestinoSensor[indiceSensor] = 'S';
+            this.destinos[indiceSensor] = padre;
+            this.tipos[indiceSensor] = 'S';
             
-            this.redSensores.get(padre).add(indiceSensor);
+            this.hijosSensores.get(padre).add(indiceSensor);
             
             ++indiceSensor;
             ++padre;
@@ -190,8 +190,8 @@ public class EstadoHC{
     public boolean hayCiclos(int origen) {
         int aux = origen;
         
-        while(!esCentro(nodoDestinoSensor[aux])){
-            aux = nodoDestinoSensor[aux];
+        while(!esCentro(destinos[aux])){
+            aux = destinos[aux];
             if(aux == origen)
                 return true;
         }
@@ -200,11 +200,11 @@ public class EstadoHC{
     } 
 
     public boolean mover(int sensor, int destino, byte tipoDestino) {
-        int destinoAnterior = nodoDestinoSensor[sensor];
-        byte tipoDestinoAnterior = tipoNodoDestinoSensor[sensor];
+        int destinoAnterior = destinos[sensor];
+        byte tipoDestinoAnterior = tipos[sensor];
                
-        nodoDestinoSensor[sensor] = destino;
-        tipoNodoDestinoSensor[sensor] = tipoDestino;
+        destinos[sensor] = destino;
+        tipos[sensor] = tipoDestino;
         
         if(tipoDestino == 'S'){
             if(!sensorAceptaConexion(sensor) || hayCiclos(destino)) {
@@ -246,16 +246,16 @@ public class EstadoHC{
         
         return !hayCiclos(sensorA) && !hayCiclos(sensorB);
 */
-        int destinoA = nodoDestinoSensor[sensorA];
-        byte tipoDestinoA = tipoNodoDestinoSensor[sensorA];
-        int destinoB = nodoDestinoSensor[sensorB];
-        byte tipoDestinoB = tipoNodoDestinoSensor[sensorB];
+        int destinoA = destinos[sensorA];
+        byte tipoDestinoA = tipos[sensorA];
+        int destinoB = destinos[sensorB];
+        byte tipoDestinoB = tipos[sensorB];
         return  mover(sensorA, destinoB, tipoDestinoB) 
                 && mover(sensorB, destinoA, tipoDestinoA);
     }
     
     public boolean movimientoValido(int sensor) {
-        int destino = nodoDestinoSensor[sensor];
+        int destino = destinos[sensor];
         return aceptaConexion(destino) && !hayCiclos(destino);
     }
     
@@ -269,19 +269,19 @@ public class EstadoHC{
     }
     
     public boolean sensorAceptaConexion(int indiceSensor) {
-        return this.redSensores.get(indiceSensor).size() < MAX_CONEXIONES_SENSORES;        
+        return this.hijosSensores.get(indiceSensor).size() < MAX_CONEXIONES_SENSORES;        
     }
     
     public boolean centroAceptaConexion(int indiceCentro) {
-        return this.redCentros.get(indiceCentro).size() < MAX_CONEXIONES_CENTROS;
+        return this.hijosCentros.get(indiceCentro).size() < MAX_CONEXIONES_CENTROS;
     }    
         
     HashMap<Integer,HashSet<Integer>> getRedSensores(){
-        return this.redSensores;
+        return this.hijosSensores;
     }
     
     HashMap<Integer,HashSet<Integer>> getRedCentros(){
-        return this.redCentros;
+        return this.hijosCentros;
     }
     
     public double getDistanciaEntreSensores(int a, int b) {
@@ -293,11 +293,11 @@ public class EstadoHC{
     }
     
     public byte[] getTipoNodoDestinoSensor() {
-        return this.tipoNodoDestinoSensor;
+        return this.tipos;
     }
     
     public int[] getNodoDestinoSensor() {
-        return this.nodoDestinoSensor;
+        return this.destinos;
     }
     
     public Sensores getSensores() {
