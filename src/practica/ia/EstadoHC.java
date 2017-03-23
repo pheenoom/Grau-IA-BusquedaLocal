@@ -245,6 +245,13 @@ public class EstadoHC{
         this.tipoNodoDestinoSensor[sensorB] = tipoDestinoA;
         
         return !hayCiclos(sensorA) && !hayCiclos(sensorB);
+*/
+        int destinoA = nodoDestinoSensor[sensorA];
+        byte tipoDestinoA = tipoNodoDestinoSensor[sensorA];
+        int destinoB = nodoDestinoSensor[sensorB];
+        byte tipoDestinoB = tipoNodoDestinoSensor[sensorB];
+        return  mover(sensorA, destinoB, tipoDestinoB) 
+                && mover(sensorB, destinoA, tipoDestinoA);
     }
     
     public boolean movimientoValido(int sensor) {
