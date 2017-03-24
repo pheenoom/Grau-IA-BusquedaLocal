@@ -27,11 +27,11 @@ public class HeuristicFunctionHC implements HeuristicFunction {
     //el valor de transmitido es el volumen de datos transmitido por el nodo hijo
     void calcularTransmitido(int padre, VecCTP vecCTP){
         int capPadre = (int) estado.getSensores().get(padre).getCapacidad();
-        if(vecCTP.t <= capPadre){
-            vecCTP.t += capPadre * 1.5;
+        if(vecCTP.t <= capPadre*2){
+            vecCTP.t += capPadre;
         }
         else{
-            vecCTP.t = 1.5 * capPadre;
+            vecCTP.t = 3* capPadre;
             vecCTP.p += vecCTP.t - capPadre;
         }
 
@@ -43,7 +43,7 @@ public class HeuristicFunctionHC implements HeuristicFunction {
         if(estado.getRedSensores().get(raiz).isEmpty()){ 
             vecCTP.c = 0.0;
             vecCTP.p = 0.0;
-            vecCTP.t = estado.getSensores().get(raiz).getCapacidad() * 0.5;
+            vecCTP.t = estado.getSensores().get(raiz).getCapacidad();
         }
         else {
             //Caso recursivo: por cada hijo calculamos subarbol
@@ -52,6 +52,7 @@ public class HeuristicFunctionHC implements HeuristicFunction {
                 double d = estado.getDistanciaEntreSensores(raiz, hijo);
                 vecCTP.c += Math.pow(d,2) * vecCTP.t;
                 calcularTransmitido(raiz, vecCTP);
+                
             }
         }
     }
@@ -72,7 +73,8 @@ public class HeuristicFunctionHC implements HeuristicFunction {
                 recorrerSensores(sensor, datosSubArbol);
                 
                 double d = estado.getDistanciaSensorACentro(sensor, centro);
-                datosCentro.c += Math.pow(d,2) * datosSubArbol.t;
+                double aux2 = Math.pow(d,2) * datosSubArbol.t;
+                datosCentro.c += aux2;
                 datosCentro.p += datosSubArbol.p;
                 datosCentro.t += datosSubArbol.t;
                 if(datosCentro.t >= 150)
