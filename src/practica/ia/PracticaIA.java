@@ -251,8 +251,8 @@ public class PracticaIA {
         debug();*/
         
         
-        Sensor s1 = new Sensor(10, 3, 1);
-        Sensor s2 = new Sensor(2, 5, 5);
+        Sensor s1 = new Sensor(10, 99, 99);
+        Sensor s2 = new Sensor(2, 100, 100);
         Centro c1 = new Centro(2, 5);
         sensores = new Sensores(0,1);
         centrosDatos = new CentrosDatos(0,1);
@@ -261,7 +261,7 @@ public class PracticaIA {
         centrosDatos.add(c1);
         estado = new EstadoHC(sensores, centrosDatos);
         estado.generarEstadoInicial();
-        estado.mover(0, 1);
+        //estado.mover(0, 1);
         debug();
         
         Problem problem = new Problem(  estado, 

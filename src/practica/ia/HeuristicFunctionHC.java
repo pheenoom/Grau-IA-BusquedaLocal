@@ -37,20 +37,22 @@ public class HeuristicFunctionHC implements HeuristicFunction {
 
     }
     
-    void recorrerSensores(int padre, VecCTP vecCTP){
-        
-        if(!estado.getRedSensores().get(padre).isEmpty()){ //hijos
-            for(Integer hijo : estado.getRedSensores().get(padre)) {                
-                recorrerSensores(hijo, vecCTP);
-                double d = estado.getDistanciaEntreSensores(padre, hijo);
-                vecCTP.c += Math.pow(d,2) * vecCTP.t;
-                calcularTransmitido(padre, vecCTP);
-            }
-        }
-        else {
+    //pone en vecCTP la informacion del coste del arbol que empieza en 'raiz'
+    void recorrerSensores(int raiz, VecCTP vecCTP){
+        //Caso base; estamos en una hoja
+        if(estado.getRedSensores().get(raiz).isEmpty()){ 
             vecCTP.c = 0.0;
             vecCTP.p = 0.0;
-            vecCTP.t = estado.getSensores().get(padre).getCapacidad() * 0.5;
+            vecCTP.t = estado.getSensores().get(raiz).getCapacidad() * 0.5;
+        }
+        else {
+            //Caso recursivo: por cada hijo calculamos subarbol
+            for(Integer hijo : estado.getRedSensores().get(raiz)) {                
+                recorrerSensores(hijo, vecCTP);
+                double d = estado.getDistanciaEntreSensores(raiz, hijo);
+                vecCTP.c += Math.pow(d,2) * vecCTP.t;
+                calcularTransmitido(raiz, vecCTP);
+            }
         }
     }
     
@@ -61,25 +63,30 @@ public class HeuristicFunctionHC implements HeuristicFunction {
         // La primera version del heuristico calculara el coste en función unicamente
         // de la distancia.
         double h;
-        VecCTP global = new VecCTP();
-        
+        VecCTP datosGlobal = new VecCTP();
         for (Integer centro = 0; centro < estado.getCentrosSize(); centro++) {
+            VecCTP datosCentro = new VecCTP();
             for (Integer sensor : estado.getHijosCentro(centro)) {
-                VecCTP vec = new VecCTP();
-                recorrerSensores(sensor, vec);
+                VecCTP datosSubArbol = new VecCTP();
+                recorrerSensores(sensor, datosSubArbol);
                 
                 double d = estado.getDistanciaSensorACentro(sensor, centro);
-                global.c = vec.c + Math.pow(d,2) * vec.t;
-                global.p = global.p + vec.p;
-                global.t = global.t + vec.t;
+                datosCentro.c = datosSubArbol.c + Math.pow(d,2) * datosSubArbol.t;
+                datosCentro.p = datosGlobal.p + datosSubArbol.p;
+                datosCentro.t = datosGlobal.t + datosSubArbol.t;
+                if(datosCentro.t >= 150)
+                {
+                    double aux = datosCentro.t;
+                    datosCentro.t = 150;
+                    datosCentro.p += aux - 150;
+                }
+                
             }
             
-            if(global.t >= 150){
-                global.t = 150;
-                global.p = global.t - 150;
-            }            
+            datosGlobal.suma(datosCentro);
+            
         }
         
-        return global.c;
+        return datosGlobal.c;
     }
 }
