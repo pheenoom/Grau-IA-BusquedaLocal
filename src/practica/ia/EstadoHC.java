@@ -57,25 +57,21 @@ public class EstadoHC{
     private void desconectarSensorAEnSesnsorB(int a, int b) {
         this.hijosSensores.get(b).remove(a);
         this.destinos[a] = -1;
-        this.tipos[a] = '-';
     }
     
     private void desconectarSensorEnCentro(int s, int c) {
         this.hijosCentros.get(c).remove(s);
         this.destinos[s] = -1;
-        this.tipos[s] = '-';
     }
     
     private void conectarSensorAEnSensorB(int a, int b) {
         this.hijosSensores.get(b).add(a);
         this.destinos[a] = b;
-        this.tipos[a] = 'S';
     }
     
     private void conectarSensorEnCentro(int s, int c) {
         this.hijosSensores.get(c).add(s);
         this.destinos[s] = c;
-        this.tipos[s] = 'C';
     }
     
     private void inicializarRed() {
@@ -90,6 +86,10 @@ public class EstadoHC{
     
     private boolean esCentro(int indice) {
         return tipos[indice] == 'C';
+    }
+    
+    private boolean esSensor(int indice) {
+        return tipos[indice] == 'S';
     }
     
     ////////////////////////////////////////////////////////////////////////////
@@ -157,19 +157,18 @@ public class EstadoHC{
     public void generarEstadoInicial() {
         int indiceSensor = 0;
         int indiceCentro = 0;
-        while (indiceSensor < NUM_SENSORES && aceptaConexion(NUM_CENTROS - 1)) {            
+        //Mientras que queden sensores y el ultimo centro acepte conexiones
+        while (indiceSensor < NUM_SENSORES && aceptaConexion(NUM_CENTROS - 1)) {
             this.hijosCentros.get(indiceCentro).add(indiceSensor);
             this.destinos[indiceSensor] = indiceCentro;
-            this.tipos[indiceSensor] = 'C';
             
             ++indiceSensor;            
             indiceCentro = (++indiceCentro) % NUM_CENTROS;
         }
-        
+        //Numero de conexiones a centros totales
         int offset = NUM_CENTROS * MAX_CONEXIONES_CENTROS;
         int j = 1;
         int padre = 0;
-        
         while (indiceSensor < NUM_SENSORES) {
             if (this.hijosSensores.get(offset * j).size() >= MAX_CONEXIONES_SENSORES) {
                 j = j * MAX_CONEXIONES_SENSORES;
@@ -178,7 +177,6 @@ public class EstadoHC{
             padre = (padre % (offset * j)) + ((j == 1) ? 0 : offset * (j/3));
             
             this.destinos[indiceSensor] = padre;
-            this.tipos[indiceSensor] = 'S';
             
             this.hijosSensores.get(padre).add(indiceSensor);
             
@@ -199,72 +197,57 @@ public class EstadoHC{
         return false;
     } 
 
-    public boolean mover(int sensor, int destino, byte tipoDestino) {
+    public boolean mover(int sensor, int nuevoDestino) {
         int destinoAnterior = destinos[sensor];
-        byte tipoDestinoAnterior = tipos[sensor];
-               
-        destinos[sensor] = destino;
-        tipos[sensor] = tipoDestino;
+        destinos[sensor] = nuevoDestino;
         
-        if(tipoDestino == 'S'){
-            if(!sensorAceptaConexion(sensor) || hayCiclos(destino)) {
-                return false;
-            }
-        }
-        else {
-            if (!centroAceptaConexion(destino)) {
-                return false;
-            }
-        }
+        if(!movimientoValido(sensor))
+            return false;
         
-        if (tipoDestinoAnterior == 'C') {                    
+        desconectarAenB(sensor, destinoAnterior);
+        conectarAenB(sensor, nuevoDestino);
+        return true;
+    }
+    
+    private void desconectarAenB(int sensor, int destinoAnterior) {
+        if (esCentro(destinoAnterior)) {
             desconectarSensorEnCentro(sensor, destinoAnterior);
         }
         else {
             desconectarSensorAEnSesnsorB(sensor, destinoAnterior);
         }
-        
-        if (tipoDestino == 'C') {
-            conectarSensorEnCentro(sensor, destino);
+    }
+
+    private void conectarAenB(int sensor, int nuevoDestino) {
+        if (esCentro(nuevoDestino)) {
+            conectarSensorEnCentro(sensor, nuevoDestino);
         }
         else {
-            conectarSensorAEnSensorB(sensor, destino);                
+            conectarSensorAEnSensorB(sensor, nuevoDestino);                
         }        
-        
-        return true;
     }
     
     public boolean intercambiar(int sensorA, int sensorB){
-        /*
-        int destinoA = nodoDestinoSensor[sensorA];
-        byte tipoDestinoA = tipoNodoDestinoSensor[sensorA];
-        
-        this.nodoDestinoSensor[sensorA] = this.nodoDestinoSensor[sensorB];
-        this.tipoNodoDestinoSensor[sensorA] = this.tipoNodoDestinoSensor[sensorB];
-        this.nodoDestinoSensor[sensorB] = destinoA;
-        this.tipoNodoDestinoSensor[sensorB] = tipoDestinoA;
-        
-        return !hayCiclos(sensorA) && !hayCiclos(sensorB);
-*/
         int destinoA = destinos[sensorA];
-        byte tipoDestinoA = tipos[sensorA];
         int destinoB = destinos[sensorB];
-        byte tipoDestinoB = tipos[sensorB];
-        return  mover(sensorA, destinoB, tipoDestinoB) 
-                && mover(sensorB, destinoA, tipoDestinoA);
+        return  mover(sensorA, destinoB) && mover(sensorB, destinoA);
     }
     
+    //Se ha "movido sensor", por lo tanto hay que comprobar que su nuevo
+    //destino acepta conexiones y que no se ha formado un ciclo 
+    //(si se ha formado un nuevo ciclo, 
+    //necesariamente ha de pasar por 'sensor' y 'destino')
     public boolean movimientoValido(int sensor) {
         int destino = destinos[sensor];
         return aceptaConexion(destino) && !hayCiclos(destino);
     }
     
-    public boolean aceptaConexion(int destino) {
-        if(esCentro(destino)) {
-            return centroAceptaConexion(destino);
+    public boolean aceptaConexion(int nodo) {
+        if(esCentro(nodo)) {
+            return centroAceptaConexion(nodo);
         }
         else {
-            return sensorAceptaConexion(destino);
+            return sensorAceptaConexion(nodo);
         }
     }
     
@@ -292,11 +275,11 @@ public class EstadoHC{
         return matrizDistanciasSensoresACentro[s][c];
     }
     
-    public byte[] getTipoNodoDestinoSensor() {
+    public byte[] getTipos() {
         return this.tipos;
     }
     
-    public int[] getNodoDestinoSensor() {
+    public int[] getDestinos() {
         return this.destinos;
     }
     
@@ -307,4 +290,5 @@ public class EstadoHC{
     public CentrosDatos getCentros() {
         return this.centros;
     }
+
 }

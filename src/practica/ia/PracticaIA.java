@@ -139,8 +139,8 @@ public class PracticaIA {
     public static void debugPrintSensorDestino() {
         System.out.println();
         System.out.println("Informacion de los nodos destino de los sensores");
-        int[] nodoDestinoSensor = estado.getNodoDestinoSensor();
-        byte[] tipoNodoDestinoSensor = estado.getTipoNodoDestinoSensor();
+        int[] nodoDestinoSensor = estado.getDestinos();
+        byte[] tipoNodoDestinoSensor = estado.getTipos();
         for (int i = 0; i < EstadoHC.NUM_SENSORES; ++i) {
             System.out.print("S" + (i + 1) + " --> ");
             if (tipoNodoDestinoSensor[i] == 'C') {

@@ -21,39 +21,41 @@ public class SuccessorFunctionHC implements SuccessorFunction{
     public List getSuccessors(Object o) {
         EstadoHC estado = (EstadoHC) o;
         ArrayList estadosGenerados = new ArrayList();
-        byte S = 'S';
-        byte C = 'C';
+        //Por cada sensor
         for (int origen = 0; origen < EstadoHC.NUM_SENSORES; ++origen) {
-            
+            //sensor x sensor
             for (int destino = 0; destino < EstadoHC.NUM_SENSORES; ++destino) {
                 if (destino != origen) 
                 {
                     EstadoHC nuevoEstadoMover = new EstadoHC(estado);
                     EstadoHC nuevoEstadoIntercambiar = new EstadoHC(estado);
                 
-                    if (nuevoEstadoMover.mover(origen, destino, S)) 
+                    if (nuevoEstadoMover.mover(origen, destino)) 
                     {
                         estadosGenerados.add(new Successor(
-                                new String("Conecto el Sensor " + (origen + 1) + " al sensor " + (destino + 1)),
+                                "Conecto el Sensor " + (origen + 1) 
+                                + " al sensor " + (destino + 1),
                                 nuevoEstadoMover));
                     }
                     
                     if (nuevoEstadoIntercambiar.intercambiar(origen, destino))
                     {
                         estadosGenerados.add(new Successor(
-                                new String("Intercambio el Sensor " + (origen + 1) + " con el sensor " + (destino + 1)),
+                                "Intercambio el Sensor " + (origen + 1) 
+                                + " con el sensor " + (destino + 1),
                                 nuevoEstadoIntercambiar)); 
                     }
                 }
             }
-            
+            //sensor x centro
             for (int destino = 0; destino < EstadoHC.NUM_CENTROS; ++destino) {
                 
                 EstadoHC nuevoEstado = new EstadoHC(estado);
-                if (nuevoEstado.mover(origen, destino, C)) 
+                if (nuevoEstado.mover(origen, destino)) 
                 {
                     estadosGenerados.add(new Successor(
-                            new String("Conecto el Sensor " + (origen + 1) + " al centro " + (destino + 1)),
+                            "Conecto el Sensor " + (origen + 1) 
+                            + " al centro " + (destino + 1),
                             nuevoEstado));
                 }                
             }
