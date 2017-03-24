@@ -198,7 +198,8 @@ public class PracticaIA {
     
     
     public static void main(String[] args) {
-        sensores = new Sensores(10, 1);
+        /*
+        sensores = new Sensores(5, 1);
         centrosDatos = new CentrosDatos(1, 1);
         
         estado = new EstadoHC(sensores, centrosDatos);
@@ -221,8 +222,8 @@ public class PracticaIA {
         }
         
         
+        */
         
-        /*
         sensores = new Sensores(100, 1234);
         centrosDatos = new CentrosDatos(4, 1234);
         estado = new EstadoHC(sensores, centrosDatos);
@@ -242,7 +243,7 @@ public class PracticaIA {
             printInstrumentation(agent.getInstrumentation());
         } catch (Exception ex) {
             Logger.getLogger(PracticaIA.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
+        }
 
     }    
 }

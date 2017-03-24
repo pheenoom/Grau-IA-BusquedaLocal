@@ -262,17 +262,12 @@ public class EstadoHC{
         
         return false;
     } 
+    
+    
 
-    public boolean mover(int sensor, int nuevoDestino) {
-        int destinoAnterior = destinos[sensor];
-        destinos[sensor] = nuevoDestino;
-        
-        if(!movimientoValido(sensor))
-            return false;
-        
-        desconectarAenB(sensor, destinoAnterior);
+    public void mover(int sensor, int nuevoDestino) {        
+        desconectarAenB(sensor, destinos[sensor]);
         conectarAenB(sensor, nuevoDestino);
-        return true;
     }
     
     private void desconectarAenB(int sensor, int destinoAnterior) {
@@ -293,20 +288,29 @@ public class EstadoHC{
         }        
     }
     
-    public boolean intercambiar(int sensorA, int sensorB){
+    public void intercambiar(int sensorA, int sensorB){
         int destinoA = destinos[sensorA];
         int destinoB = destinos[sensorB];
-        return  mover(sensorA, destinoB) && mover(sensorB, destinoA);
+        mover(sensorA, destinoB);
+        mover(sensorB, destinoA);
     }
     
     //Se ha "movido sensor", por lo tanto hay que comprobar que su nuevo
     //destino acepta conexiones y que no se ha formado un ciclo 
     //(si se ha formado un nuevo ciclo, 
     //necesariamente ha de pasar por 'sensor' y 'destino')
-    public boolean movimientoValido(int sensor) {
-        int destino = destinos[sensor];
-        return aceptaConexion(destino) && !hayCiclos(sensor);
+    public boolean movimientoValido(int sensor, int futuroDestino) {
+        return aceptaConexion(futuroDestino) && sensor != futuroDestino;
     }
+    
+    public boolean intercambioValido(int sensorA, int sensorB){
+        int destinoA = destinos[sensorA];
+        int destinoB = destinos[sensorB];
+        return movimientoValido(sensorA,destinoB) 
+                && movimientoValido(sensorB, destinoA);
+        
+    }
+    
     
     public boolean aceptaConexion(int nodo) {
         if(esCentro(nodo)) {

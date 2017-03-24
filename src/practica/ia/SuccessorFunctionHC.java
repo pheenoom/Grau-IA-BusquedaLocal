@@ -27,19 +27,18 @@ public class SuccessorFunctionHC implements SuccessorFunction{
             for (int destino = 0; destino < EstadoHC.NUM_SENSORES; ++destino) {
                 if (destino != origen) 
                 {
-                    EstadoHC nuevoEstadoMover = new EstadoHC(estado);
-                    EstadoHC nuevoEstadoIntercambiar = new EstadoHC(estado);
-                
-                    if (nuevoEstadoMover.mover(origen, destino)) 
-                    {
+                    if (estado.movimientoValido(origen, destino)) 
+                    {                        
+                        EstadoHC nuevoEstadoMover = new EstadoHC(estado);
                         estadosGenerados.add(new Successor(
                                 "Conecto el Sensor " + (origen + 1) 
                                 + " al sensor " + (destino + 1),
                                 nuevoEstadoMover));
                     }
                     
-                    if (nuevoEstadoIntercambiar.intercambiar(origen, destino))
+                    if (estado.intercambioValido(origen, destino))
                     {
+                        EstadoHC nuevoEstadoIntercambiar = new EstadoHC(estado);
                         estadosGenerados.add(new Successor(
                                 "Intercambio el Sensor " + (origen + 1) 
                                 + " con el sensor " + (destino + 1),
@@ -48,11 +47,11 @@ public class SuccessorFunctionHC implements SuccessorFunction{
                 }
             }
             //sensor x centro
-            for (int destino = 0; destino < EstadoHC.NUM_CENTROS; ++destino) {
-                
-                EstadoHC nuevoEstado = new EstadoHC(estado);
-                if (nuevoEstado.mover(origen, nuevoEstado.getCentro(destino))) 
+            for (int destino = 0; destino < EstadoHC.NUM_CENTROS; ++destino) 
+            {   
+                if (estado.movimientoValido(origen, estado.getCentro(destino)))
                 {
+                    EstadoHC nuevoEstado = new EstadoHC(estado);
                     estadosGenerados.add(new Successor(
                             "Conecto el Sensor " + (origen + 1) 
                             + " al centro " + (destino + 1),
