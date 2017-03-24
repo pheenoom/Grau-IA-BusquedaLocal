@@ -71,9 +71,9 @@ public class HeuristicFunctionHC implements HeuristicFunction {
                 recorrerSensores(sensor, datosSubArbol);
                 
                 double d = estado.getDistanciaSensorACentro(sensor, centro);
-                datosCentro.c = datosSubArbol.c + Math.pow(d,2) * datosSubArbol.t;
-                datosCentro.p = datosGlobal.p + datosSubArbol.p;
-                datosCentro.t = datosGlobal.t + datosSubArbol.t;
+                datosCentro.c += Math.pow(d,2) * datosSubArbol.t;
+                datosCentro.p += datosSubArbol.p;
+                datosCentro.t += datosSubArbol.t;
                 if(datosCentro.t >= 150)
                 {
                     double aux = datosCentro.t;

@@ -240,7 +240,7 @@ public class PracticaIA {
         // Ejemplo de prueba
         //estado = new EstadoHC(sensores, centrosDatos);
         //estado.generarEstadoInicial();
-        
+        */
         // Ejemplo normal
         sensores = new Sensores(100, 1234);
         centrosDatos = new CentrosDatos(4, 1234);
@@ -248,9 +248,9 @@ public class PracticaIA {
         estado.generarEstadoInicial();
         
         
-        debug();*/
+        debug();
         
-        
+        /*
         Sensor s1 = new Sensor(10, 99, 99);
         Sensor s2 = new Sensor(2, 100, 100);
         Centro c1 = new Centro(2, 5);
@@ -278,7 +278,7 @@ public class PracticaIA {
         } catch (Exception ex) {
             Logger.getLogger(PracticaIA.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+        */
         /*
         sensores = new Sensores(10, 1234);
         centrosDatos = new CentrosDatos(1, 1234);
@@ -286,7 +286,7 @@ public class PracticaIA {
         estado.generarEstadoInicial();
         
         
-        debug();
+        debug();*/
         Problem problem = new Problem(  estado, 
                                         new SuccessorFunctionHC(), 
                                         new GoalTestHC(),
@@ -301,6 +301,6 @@ public class PracticaIA {
         } catch (Exception ex) {
             Logger.getLogger(PracticaIA.class.getName()).log(Level.SEVERE, null, ex);
         }
-*/
+
     }    
 }

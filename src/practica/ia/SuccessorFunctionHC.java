@@ -51,7 +51,7 @@ public class SuccessorFunctionHC implements SuccessorFunction{
             for (int destino = 0; destino < EstadoHC.NUM_CENTROS; ++destino) {
                 
                 EstadoHC nuevoEstado = new EstadoHC(estado);
-                if (nuevoEstado.mover(origen, destino)) 
+                if (nuevoEstado.mover(origen, nuevoEstado.getCentro(destino))) 
                 {
                     estadosGenerados.add(new Successor(
                             "Conecto el Sensor " + (origen + 1) 

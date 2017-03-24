@@ -308,4 +308,8 @@ public class EstadoHC{
         return hijosCentros.get(i+NUM_SENSORES);
     }
 
+    int getCentro(int num_centro) {
+        return num_centro+NUM_SENSORES;
+    }
+
 }
