@@ -114,10 +114,9 @@ public class PracticaIA {
             System.out.print("\t");
         }
         
-        HashMap<Integer, HashSet<Integer>> redSensores = estado.getRedSensores();
-        System.out.println("Sensor " + (indice + 1) + ": ");
-        for (Integer s : redSensores.get(indice)) {
-            debugPrintRed_i(s,++tab);
+        for (Integer s : estado.getRedSensores().get(indice)) {
+            System.out.println("Sensor " + (s + 1) + ": ");
+            debugPrintRed_i(s,tab);
         }
     }
     
@@ -129,7 +128,8 @@ public class PracticaIA {
             System.out.println("##############################################");
             System.out.println("Centro " + (i + 1) + ", tiene las siguientes conexiones: ");
             for (Integer s : estado.getHijosCentro(i)) {
-                debugPrintRed_i(s, 1);
+                System.out.println("\tSensor " + (s + 1) + ": ");
+                debugPrintRed_i(s, 2);
             }
             System.out.println("##############################################");
         }
@@ -143,7 +143,7 @@ public class PracticaIA {
         for (int i = 0; i < EstadoHC.NUM_SENSORES; ++i) {
             System.out.print("S" + (i + 1) + " --> ");
             System.out.println(""+(char)tipoNodoDestinoSensor[nodoDestinoSensor[i]]
-                     + (nodoDestinoSensor[i] + 1 - EstadoHC.NUM_SENSORES));
+                     + (nodoDestinoSensor[i] + 1));
         }
     }
     
@@ -154,7 +154,6 @@ public class PracticaIA {
         debugPrintMatrizSensorACentro();
         debugPrintSensores();
         debugPrintCentros();
-        debugPrintRed();
         debugPrintSensorDestino();
         System.out.println("\n\t\t########################## Fi Debug ##########################");
     }
@@ -199,71 +198,37 @@ public class PracticaIA {
     
     
     public static void main(String[] args) {
+        sensores = new Sensores(10, 1);
+        centrosDatos = new CentrosDatos(1, 1);
+        
+        estado = new EstadoHC(sensores, centrosDatos);
+        estado.generarEstadoInicial();
+        debug();
+      
+        System.out.println("Data in: ");
+        for (Double d : estado.getSensorDataIn()) {
+            System.out.println(d);
+        }
+        
+        System.out.println("Data out: ");
+        for (Double d : estado.getSensorDataOut()) {
+            System.out.println(d);
+        }
+        
+        System.out.println("Distancia: ");
+        for (Double d : estado.getSensorDistanciaAlDestino()) {
+            System.out.println(d);
+        }
+        
+        
+        
         /*
-        Sensor s1 = new Sensor(10, 3, 1);
-        Sensor s2 = new Sensor(4, 6, 1);
-        Sensor s3 = new Sensor(2, 8, 0);
-        Sensor s4 = new Sensor(2, 8, 2);
-        Sensor s5 = new Sensor(2, 10, 2);
-        Sensor s6 = new Sensor(4, 5, 4);
-        Sensor s7 = new Sensor(10, 0, 4);
-        Sensor s8 = new Sensor(2, 7, 4);
-        Sensor s9 = new Sensor(2, 9, 4);
-        Sensor s10 = new Sensor(10, 5, 6);
-        Sensor s11 = new Sensor(2, 2, 6);
-        Sensor s12 = new Sensor(10, 9, 6);
-        
-        Centro c1 = new Centro(2, 5);
-        Centro c2 = new Centro(7, 6);
-        Centro c3 = new Centro(5, 3);
-        
-        sensores = new Sensores(0,1);
-        centrosDatos = new CentrosDatos(0,1);
-        
-        sensores.add(s1);
-        sensores.add(s2);
-        sensores.add(s3);
-        sensores.add(s4);
-        sensores.add(s5);
-        sensores.add(s6);
-        sensores.add(s7);
-        sensores.add(s8);
-        sensores.add(s9);
-        sensores.add(s10);
-        sensores.add(s11);
-        sensores.add(s12);
-        
-        centrosDatos.add(c1);
-        centrosDatos.add(c2);
-        centrosDatos.add(c3);
-        
-        // Ejemplo de prueba
-        //estado = new EstadoHC(sensores, centrosDatos);
-        //estado.generarEstadoInicial();
-        */
-        // Ejemplo normal
         sensores = new Sensores(100, 1234);
         centrosDatos = new CentrosDatos(4, 1234);
         estado = new EstadoHC(sensores, centrosDatos);
         estado.generarEstadoInicial();
         
         
-        debug();
-        
-        /*
-        Sensor s1 = new Sensor(10, 99, 99);
-        Sensor s2 = new Sensor(2, 100, 100);
-        Centro c1 = new Centro(2, 5);
-        sensores = new Sensores(0,1);
-        centrosDatos = new CentrosDatos(0,1);
-        sensores.add(s1);
-        sensores.add(s2);
-        centrosDatos.add(c1);
-        estado = new EstadoHC(sensores, centrosDatos);
-        estado.generarEstadoInicial();
-        //estado.mover(0, 1);
-        debug();
-        
         Problem problem = new Problem(  estado, 
                                         new SuccessorFunctionHC(), 
                                         new GoalTestHC(),
@@ -277,30 +242,7 @@ public class PracticaIA {
             printInstrumentation(agent.getInstrumentation());
         } catch (Exception ex) {
             Logger.getLogger(PracticaIA.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        */
-        /*
-        sensores = new Sensores(10, 1234);
-        centrosDatos = new CentrosDatos(1, 1234);
-        estado = new EstadoHC(sensores, centrosDatos);
-        estado.generarEstadoInicial();
-        
-        
-        debug();*/
-        Problem problem = new Problem(  estado, 
-                                        new SuccessorFunctionHC(), 
-                                        new GoalTestHC(),
-                                        new HeuristicFunctionHC());
-        
-        HillClimbingSearch search = new HillClimbingSearch();
-        try {
-            SearchAgent agent = new SearchAgent(problem, search);  
-            
-            printActions(agent.getActions());
-            printInstrumentation(agent.getInstrumentation());
-        } catch (Exception ex) {
-            Logger.getLogger(PracticaIA.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
 
     }    
 }

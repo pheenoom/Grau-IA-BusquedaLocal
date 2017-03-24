@@ -10,7 +10,7 @@ import java.util.Set;
 
 public class EstadoHC{
     public static final int MAX_CONEXIONES_SENSORES = 3;
-    public static final int MAX_CONEXIONES_CENTROS = 25;
+    public static final int MAX_CONEXIONES_CENTROS = 2;
     
     public static int NUM_SENSORES;   
     public static int NUM_CENTROS;
@@ -21,9 +21,55 @@ public class EstadoHC{
     private static Sensores sensores;
     
     private int[] destinos;
+    private double[] sensorDistanciaAlDestino;
+    private double[] sensorDataIn;
+    private double[] sensorDataOut;
     private HashMap<Integer,HashSet<Integer>> hijosSensores;
     //En general, el indice de los centros es su numero + numero de sensores
     private HashMap<Integer,HashSet<Integer>> hijosCentros;
+    
+    
+    
+    ////
+    
+    public void reCalcularDades(int indiceSensor) {
+        while (!esCentro(this.destinos[indiceSensor])) {
+            int sensorDestino = this.destinos[indiceSensor];
+            
+            double tmpDataIn =  this.sensorDataIn[sensorDestino] +
+                                this.sensorDataOut[indiceSensor];
+            
+            double capacidadSensorDestino = sensores.get(sensorDestino).getCapacidad() * 2.0;
+            if (tmpDataIn > capacidadSensorDestino) {
+                this.sensorDataIn[sensorDestino] = capacidadSensorDestino;
+                this.sensorDataOut[sensorDestino] = capacidadSensorDestino * 1.5;
+            }
+            else {
+                this.sensorDataIn[sensorDestino] = tmpDataIn;
+                this.sensorDataOut[sensorDestino] = tmpDataIn + capacidadSensorDestino * 0.5;
+            }
+            
+            for (Integer s : this.hijosSensores.get(indiceSensor)) {
+                this.sensorDistanciaAlDestino[indiceSensor] += this.sensorDistanciaAlDestino[s];
+            }
+
+            indiceSensor = sensorDestino;                                    
+        }
+    }
+    
+    public double[] getSensorDataIn() {
+        return this.sensorDataIn;
+    }
+    
+    public double[] getSensorDataOut() {
+        return this.sensorDataOut;
+    }
+    
+    public double[] getSensorDistanciaAlDestino() {
+        return this.sensorDistanciaAlDestino;
+    }
+    
+    ////
 
     ////////////////////////////////////////////////////////////////////////////
     ///                         Metodos privados                             ///
@@ -93,6 +139,7 @@ public class EstadoHC{
         return indice < NUM_SENSORES;
     }
     
+    
     ////////////////////////////////////////////////////////////////////////////
     ///                            Constructor                               ///
     ////////////////////////////////////////////////////////////////////////////
@@ -115,6 +162,10 @@ public class EstadoHC{
         inicializarRed();
         
         this.destinos = new int[NUM_SENSORES];
+        this.sensorDataIn = new double[NUM_SENSORES];
+        this.sensorDataOut = new double[NUM_SENSORES];
+        this.sensorDistanciaAlDestino = new double[NUM_SENSORES];
+        
               
         matrizDistanciasEntreSensores = new double[NUM_SENSORES][NUM_SENSORES];
         calcularDistanciasEntreSensores();
@@ -162,6 +213,7 @@ public class EstadoHC{
         while (indiceSensor < NUM_SENSORES && aceptaConexion(indexUltimoCentro)) {
             this.hijosCentros.get(indiceCentro).add(indiceSensor);
             this.destinos[indiceSensor] = indiceCentro;
+            this.sensorDataOut[indiceSensor] = sensores.get(indiceSensor).getCapacidad();
             
             ++indiceSensor;
             
@@ -170,22 +222,31 @@ public class EstadoHC{
                 indiceCentro = NUM_SENSORES;
         }
         //Numero de conexiones a centros totales
-        int offset = NUM_CENTROS * MAX_CONEXIONES_CENTROS;
         int j = 1;
         int padre = 0;
+        int indicePrimerSensor = 0;
+        int indiceUltimoSensor = NUM_CENTROS * MAX_CONEXIONES_CENTROS;
         while (indiceSensor < NUM_SENSORES) {
-            if (this.hijosSensores.get(offset * j).size() >= MAX_CONEXIONES_SENSORES) {
-                j = j * MAX_CONEXIONES_SENSORES;
+            if (this.hijosSensores.get(indiceUltimoSensor - 1).size() >= MAX_CONEXIONES_SENSORES) {
+                indicePrimerSensor = indiceUltimoSensor;
+                indiceUltimoSensor = indiceUltimoSensor + indicePrimerSensor * MAX_CONEXIONES_SENSORES;
             }
             
-            padre = (padre % (offset * j)) + ((j == 1) ? 0 : offset * (j/3));
+            if (padre >= indiceUltimoSensor) {
+                padre = indicePrimerSensor;
+            }
             
-            this.destinos[indiceSensor] = padre;
-            
+            this.destinos[indiceSensor] = padre;            
             this.hijosSensores.get(padre).add(indiceSensor);
+            this.sensorDataOut[indiceSensor] = sensores.get(indiceSensor).getCapacidad();
+            this.sensorDistanciaAlDestino[indiceSensor] = matrizDistanciasEntreSensores[indiceSensor][padre];
             
             ++indiceSensor;
             ++padre;
+        }
+        
+        for (int i = indicePrimerSensor; i < NUM_SENSORES; ++i) {
+            reCalcularDades(i);
         }
     }
     

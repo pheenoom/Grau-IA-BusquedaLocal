@@ -55,15 +55,16 @@ public class HeuristicFunctionHC implements HeuristicFunction {
             }
         }
     }
-    
+        
     @Override
     public double getHeuristicValue(Object o) {        
         estado = (EstadoHC) o;
         
         // La primera version del heuristico calculara el coste en función unicamente
         // de la distancia.
-        double h;
+        
         VecCTP datosGlobal = new VecCTP();
+        
         for (Integer centro = 0; centro < estado.getCentrosSize(); centro++) {
             VecCTP datosCentro = new VecCTP();
             for (Integer sensor : estado.getHijosCentro(centro)) {
