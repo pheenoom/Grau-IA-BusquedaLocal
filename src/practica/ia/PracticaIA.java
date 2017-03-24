@@ -125,11 +125,10 @@ public class PracticaIA {
         System.out.println();
         System.out.println("Informacion de la red: ");
         
-        HashMap<Integer, HashSet<Integer>> redCentros = estado.getRedCentros();
         for (int i = 0; i < EstadoHC.NUM_CENTROS; ++i) {
             System.out.println("##############################################");
             System.out.println("Centro " + (i + 1) + ", tiene las siguientes conexiones: ");
-            for (Integer s : redCentros.get(i)) {
+            for (Integer s : estado.getHijosCentro(i)) {
                 debugPrintRed_i(s, 1);
             }
             System.out.println("##############################################");
@@ -143,12 +142,8 @@ public class PracticaIA {
         byte[] tipoNodoDestinoSensor = estado.getTipos();
         for (int i = 0; i < EstadoHC.NUM_SENSORES; ++i) {
             System.out.print("S" + (i + 1) + " --> ");
-            if (tipoNodoDestinoSensor[i] == 'C') {
-                System.out.println("C" + (nodoDestinoSensor[i] + 1));
-            }
-            else {                
-                System.out.println("S" + (nodoDestinoSensor[i] + 1));
-            }
+            System.out.println(""+(char)tipoNodoDestinoSensor[nodoDestinoSensor[i]]
+                     + (nodoDestinoSensor[i] + 1 - EstadoHC.NUM_SENSORES));
         }
     }
     
@@ -284,7 +279,7 @@ public class PracticaIA {
             Logger.getLogger(PracticaIA.class.getName()).log(Level.SEVERE, null, ex);
         }
         */
-        
+        /*
         sensores = new Sensores(10, 1234);
         centrosDatos = new CentrosDatos(1, 1234);
         estado = new EstadoHC(sensores, centrosDatos);
@@ -306,6 +301,6 @@ public class PracticaIA {
         } catch (Exception ex) {
             Logger.getLogger(PracticaIA.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+*/
     }    
 }

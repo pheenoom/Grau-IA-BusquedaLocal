@@ -63,8 +63,8 @@ public class HeuristicFunctionHC implements HeuristicFunction {
         double h;
         VecCTP global = new VecCTP();
         
-        for (Integer centro : estado.getRedCentros().keySet()) {
-            for (Integer sensor : estado.getRedCentros().get(centro)) {
+        for (Integer centro = 0; centro < estado.getCentrosSize(); centro++) {
+            for (Integer sensor : estado.getHijosCentro(centro)) {
                 VecCTP vec = new VecCTP();
                 recorrerSensores(sensor, vec);
                 
