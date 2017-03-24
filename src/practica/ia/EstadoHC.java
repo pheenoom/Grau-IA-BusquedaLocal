@@ -22,6 +22,7 @@ public class EstadoHC{
     
     private int[] destinos;
     private HashMap<Integer,HashSet<Integer>> hijosSensores;
+    //En general, el indice de los centros es su numero + numero de sensores
     private HashMap<Integer,HashSet<Integer>> hijosCentros;
 
     ////////////////////////////////////////////////////////////////////////////

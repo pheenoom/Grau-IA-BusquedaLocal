@@ -250,9 +250,9 @@ public class PracticaIA {
         
         debug();*/
         
-        /*
+        
         Sensor s1 = new Sensor(10, 3, 1);
-        Sensor s2 = new Sensor(2, 3, 1);
+        Sensor s2 = new Sensor(2, 5, 5);
         Centro c1 = new Centro(2, 5);
         sensores = new Sensores(0,1);
         centrosDatos = new CentrosDatos(0,1);
@@ -261,7 +261,7 @@ public class PracticaIA {
         centrosDatos.add(c1);
         estado = new EstadoHC(sensores, centrosDatos);
         estado.generarEstadoInicial();
-        estado.mover(0, 1, (byte)'S');
+        estado.mover(0, 1);
         debug();
         
         Problem problem = new Problem(  estado, 
@@ -278,7 +278,7 @@ public class PracticaIA {
         } catch (Exception ex) {
             Logger.getLogger(PracticaIA.class.getName()).log(Level.SEVERE, null, ex);
         }
-        */
+        
         /*
         sensores = new Sensores(10, 1234);
         centrosDatos = new CentrosDatos(1, 1234);
