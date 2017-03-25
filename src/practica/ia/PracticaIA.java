@@ -220,19 +220,19 @@ public class PracticaIA {
     public static void main(String[] args) {
         long startTime = System.nanoTime();
         
-        sensores = new Sensores(0, 1234);
-        
+        sensores = new Sensores(100, 1234);
+        /*
         sensores.add(new Sensor(1, 1, 1));
         sensores.add(new Sensor(2, 1, 2));
         sensores.add(new Sensor(5, 1, 3));
-                
-        centrosDatos = new CentrosDatos(0, 1234);
-        centrosDatos.add(new Centro(1, 0));
+          */      
+        centrosDatos = new CentrosDatos(4, 1234);
+        //centrosDatos.add(new Centro(1, 0));
         
         estado = new EstadoHC(sensores, centrosDatos);
         estado.generarEstadoInicial();
         
-        
+        System.out.println("Coste INICIAL: " + calculaCoste(estado));
         Problem problem = new Problem(  estado, 
                                         new SuccessorFunctionHC(), 
                                         new GoalTestHC(),
@@ -242,10 +242,10 @@ public class PracticaIA {
         try {
             SearchAgent agent = new SearchAgent(problem, search);  
             
-            printActions(agent.getActions());
+            //printActions(agent.getActions());
             printInstrumentation(agent.getInstrumentation());
             EstadoHC estadoFinal =(EstadoHC) search.getGoalState();
-            System.out.println("\t\t################  Tiempo total en milisegundos: " + ((System.nanoTime() - startTime)/1e6) + " ################  ");
+            System.out.println("################  Tiempo total en milisegundos: " + ((System.nanoTime() - startTime)/1e6) + " ################  ");
             
             System.out.println("Coste FINAL: " + calculaCoste(estadoFinal));
         } catch (Exception ex) {
