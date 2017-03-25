@@ -37,7 +37,7 @@ public class SuccessorFunctionHC implements SuccessorFunction{
                                 + " con el sensor " + (destino + 1),
                                 nuevoEstadoIntercambiar)); 
                     }
-                    else if (estado.movimientoValido(origen, destino)) 
+                    if (estado.movimientoValido(origen, destino)) 
                     {                        
                         EstadoHC nuevoEstadoMover = new EstadoHC(estado);
                         nuevoEstadoMover.mover(origen, destino);

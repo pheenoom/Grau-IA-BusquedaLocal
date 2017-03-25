@@ -73,12 +73,13 @@ public class EstadoHC{
     private void reCalcularDades(int indiceSensor) {
         while (!esCentro(indiceSensor)) {
             double tmpDataIn = 0.0;            
+            double tmpDataLoss = 0.0;
             double tmpCoste = 0.0;
             
             for (Integer s : this.hijosSensores.get(indiceSensor)) {
                 tmpDataIn += this.sensorDataOut[s];
                 tmpCoste += this.sensorCoste[s];
-                
+                tmpDataLoss += this.sensorDataLoss[s];
                 double d = matrizDistanciasEntreSensores[indiceSensor][s];
                 tmpCoste = tmpCoste + d * this.sensorDataOut[s];
             }
@@ -86,11 +87,11 @@ public class EstadoHC{
             double capacidadSensorDestino = sensores.get(indiceSensor).getCapacidad() * 2.0;
             if (tmpDataIn > capacidadSensorDestino) {
                 this.sensorDataOut[indiceSensor] = capacidadSensorDestino * 1.5;
-                this.sensorDataLoss[indiceSensor] = tmpDataIn - capacidadSensorDestino;
+                this.sensorDataLoss[indiceSensor] = tmpDataLoss + tmpDataIn - capacidadSensorDestino;
             }
             else {
                 this.sensorDataOut[indiceSensor] = tmpDataIn + capacidadSensorDestino * 0.5;
-                this.sensorDataLoss[indiceSensor] = 0.0;
+                this.sensorDataLoss[indiceSensor] =tmpDataLoss;
             }
             
             this.sensorDataIn[indiceSensor] = tmpDataIn;

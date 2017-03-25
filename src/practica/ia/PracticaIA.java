@@ -5,7 +5,9 @@
  */
 package practica.ia;
 
+import IA.Red.Centro;
 import IA.Red.CentrosDatos;
+import IA.Red.Sensor;
 import IA.Red.Sensores;
 import aima.search.framework.Problem;
 import aima.search.framework.SearchAgent;
@@ -170,13 +172,18 @@ public class PracticaIA {
     public static void main(String[] args) {
         long startTime = System.nanoTime();
         
-        sensores = new Sensores(100, 1234);                        
-        centrosDatos = new CentrosDatos(4, 1234);
         
+        sensores = new Sensores(100, 4321);
+        //sensores.add(new Sensor(1, 1, 1));
+        //sensores.add(new Sensor(5, 1, 100));
+        centrosDatos = new CentrosDatos(4, 1234);
+        //centrosDatos.add(new Centro(1,0));
         estado = new EstadoHC(sensores, centrosDatos);
         estado.generarEstadoInicial();
+        debugPrintGrafInfo();
         
         System.out.println("Coste INICIAL: " + calculaCoste(estado));
+        System.out.println("Perdidas INICIAL: " + calculaPerdidas(estado));
         Problem problem = new Problem(  estado, 
                                         new SuccessorFunctionHC(), 
                                         new GoalTestHC(),
@@ -192,11 +199,14 @@ public class PracticaIA {
             System.out.println("################  Tiempo total en milisegundos: " + ((System.nanoTime() - startTime)/1e6) + " ################  ");
             
             System.out.println("Coste FINAL: " + calculaCoste(estadoFinal));
+            System.out.println("Perdidas FINAL: " + calculaPerdidas(estadoFinal));
         } catch (Exception ex) {
             Logger.getLogger(PracticaIA.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }    
+    
+    
 
     private static double calculaCoste(EstadoHC estado) {
             double coste = 0.0;
@@ -210,5 +220,24 @@ public class PracticaIA {
             }
             
             return coste;
+    }
+
+    private static double calculaPerdidas(EstadoHC estadoFinal) {
+        double perdidas = 0.0;
+        for (int c = 0; c < EstadoHC.NUM_CENTROS; c++) {
+            double dataIn = 0.0;
+            for (Integer s : estadoFinal.getHijosCentro(c)) {
+                perdidas += estadoFinal.getSensorDataLoss(s);
+                dataIn += estadoFinal.getSensorDataOut(s);
+            }
+            if(dataIn > 150)
+            {
+                 perdidas += dataIn-150;
+            }
+            
+            
+        }
+        
+        return perdidas;
     }
 }
