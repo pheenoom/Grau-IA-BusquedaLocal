@@ -8,7 +8,7 @@ import aima.search.framework.HeuristicFunction;
  */
 public class HeuristicFunctionHC implements HeuristicFunction {
     private static EstadoHC estado;
-    private static double COSTE_PERDIDA = 0.91; 
+    private static double COSTE_PERDIDA = 0.1; 
             
     @Override
     public double getHeuristicValue(Object o) {        

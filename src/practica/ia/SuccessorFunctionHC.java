@@ -27,16 +27,6 @@ public class SuccessorFunctionHC implements SuccessorFunction{
             for (int destino = 0; destino < EstadoHC.NUM_SENSORES; ++destino) {
                 if (destino != origen) 
                 {
-                    
-                    if (estado.intercambioValido(origen, destino))
-                    {
-                        EstadoHC nuevoEstadoIntercambiar = new EstadoHC(estado);
-                        nuevoEstadoIntercambiar.intercambiar(origen, destino);
-                        estadosGenerados.add(new Successor(
-                                "Intercambio el Sensor " + (origen + 1) 
-                                + " con el sensor " + (destino + 1),
-                                nuevoEstadoIntercambiar)); 
-                    }
                     if (estado.movimientoValido(origen, destino)) 
                     {                        
                         EstadoHC nuevoEstadoMover = new EstadoHC(estado);
