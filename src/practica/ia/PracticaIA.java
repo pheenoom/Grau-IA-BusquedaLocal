@@ -224,12 +224,42 @@ public class PracticaIA {
         
         */
         
-        sensores = new Sensores(100, 1234);
-        centrosDatos = new CentrosDatos(4, 1234);
+        sensores = new Sensores(0, 1234);
+        
+        sensores.add(new Sensor(1, 1, 1));
+        sensores.add(new Sensor(2, 2, 2));
+        sensores.add(new Sensor(5, 3, 3));
+        
+        centrosDatos = new CentrosDatos(1, 1234);
         estado = new EstadoHC(sensores, centrosDatos);
         estado.generarEstadoInicial();
         
         
+        debug();
+        estado.mover(2, 3);
+        //estado.mover(2, 11);
+        //estado.mover(4, 11);
+        //estado.mover(3, 11);
+        //estado.intercambiar(2, 3);
+        
+        System.out.println("Data in: ");
+        for (int i = 0; i < estado.getSensorDataIn().length; ++i) {            
+            System.out.println("S" + (i+1) + " --> " + estado.getSensorDataIn()[i]);
+        }
+        
+        System.out.println("Data out: ");
+        for (int i = 0; i < estado.getSensorDataIn().length; ++i) {            
+            System.out.println("S" + (i+1) + " --> " + estado.getSensorDataOut()[i]);
+        }
+        
+        System.out.println("Data Loss: ");
+        for (int i = 0; i < estado.getSensorDataIn().length; ++i) {            
+            System.out.println("S" + (i+1) + " --> " + estado.getSensorDataLoss()[i]);
+        }
+        
+        
+        
+        /*
         Problem problem = new Problem(  estado, 
                                         new SuccessorFunctionHC(), 
                                         new GoalTestHC(),
@@ -243,7 +273,7 @@ public class PracticaIA {
             printInstrumentation(agent.getInstrumentation());
         } catch (Exception ex) {
             Logger.getLogger(PracticaIA.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
 
     }    
 }
