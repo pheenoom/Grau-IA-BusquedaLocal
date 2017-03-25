@@ -157,7 +157,7 @@ public class PracticaIA {
         debugPrintSensorDestino();
         System.out.println("\n\t\t########################## Fi Debug ##########################");
     }
-    
+    /*
     public static void debugHyaCiclos() {
         ArrayList<Boolean> ciclos = new ArrayList<>();
         
@@ -177,7 +177,7 @@ public class PracticaIA {
             System.out.println("No hay ciclos!");
         }    
     }
-    
+    */
     
     private static void printInstrumentation(Properties properties) {
         Iterator keys = properties.keySet().iterator();
