@@ -232,17 +232,8 @@ public class PracticaIA {
         for (int i = 0; i < estado.getSensorDataIn().length; ++i) {            
             System.out.println("S" + (i+1) + " --> " + estado.getSensorCoste()[i]);
         }
-        
-        double coste = 0.0;
-        for (Integer c : estado.getRedCentros().keySet()) {
-            for (Integer s : estado.getRedCentros().get(c)) {
-                coste += estado.getSensorCoste()[s];
-                double aux = Math.pow(estado.getDistanciaSensorACentro(s, c - EstadoHC.NUM_SENSORES),2.0) * estado.getSensorDataOut()[s];
-                coste += aux;
-            }
-        }
-        
-        System.out.println("Coste CENTRO 1: " + coste);
+                
+        System.out.println("Coste inicial: " + calculaCoste(estado));
         
         
         
@@ -257,9 +248,25 @@ public class PracticaIA {
             
             printActions(agent.getActions());
             printInstrumentation(agent.getInstrumentation());
+            EstadoHC estadoFinal =(EstadoHC) search.getGoalState();
+            System.out.println("Coste FINAL: " + calculaCoste(estadoFinal));
         } catch (Exception ex) {
             Logger.getLogger(PracticaIA.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }    
+
+    private static double calculaCoste(EstadoHC estado) {
+            double coste = 0.0;
+            for (int c = 0; c < EstadoHC.NUM_CENTROS; c++) {
+                for (Integer s : estado.getHijosCentro(c)) {
+                    coste += estado.getSensorCoste()[s];
+                    double aux = Math.pow(estado.getDistanciaSensorACentro(s, c),2.0) 
+                            * estado.getSensorDataOut()[s];
+                    coste += aux;
+                }
+            }
+            
+            return coste;
+    }
 }
