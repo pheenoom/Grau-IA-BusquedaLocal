@@ -25,6 +25,7 @@ public class EstadoHC{
     private double[] sensorDataIn;
     private double[] sensorDataOut;
     private double[] sensorDataLoss;
+    private double[] sensorCoste;
     private HashMap<Integer,HashSet<Integer>> hijosSensores;
     //En general, el indice de los centros es su numero + numero de sensores
     private HashMap<Integer,HashSet<Integer>> hijosCentros;
@@ -34,8 +35,10 @@ public class EstadoHC{
     public void reCalcularDades(int indiceSensor) {
         while (!esCentro(indiceSensor)) {
             double tmpDataIn = 0.0;
+            double tmpCoste = 0.0;
             for (Integer s : this.hijosSensores.get(indiceSensor)) {
                 tmpDataIn += this.sensorDataOut[s];
+                tmpCoste += this.sensorCoste[s];
             }
 
             double capacidadSensorDestino = sensores.get(indiceSensor).getCapacidad() * 2.0;
@@ -48,6 +51,16 @@ public class EstadoHC{
                 this.sensorDataLoss[indiceSensor] = 0.0;
             }
             this.sensorDataIn[indiceSensor] = tmpDataIn;
+            
+            double d;
+            if (esCentro(this.destinos[indiceSensor])) {
+                d = matrizDistanciasSensoresACentro[indiceSensor][this.destinos[indiceSensor] - NUM_SENSORES];
+            }
+            else {
+                d = matrizDistanciasEntreSensores[indiceSensor][this.destinos[indiceSensor]];
+            }
+            
+            this.sensorCoste[indiceSensor] = tmpCoste + (Math.pow(d, 2.0) * this.sensorDataOut[indiceSensor]);
             
             indiceSensor = this.destinos[indiceSensor];                           
         }
@@ -67,6 +80,10 @@ public class EstadoHC{
     
     public double[] getSensorDataLoss() {
         return this.sensorDataLoss;
+    }
+    
+    public double[] getSensorCoste() {
+        return this.sensorCoste;
     }
     
     ////
@@ -146,6 +163,7 @@ public class EstadoHC{
         this.sensorDataOut = new double[NUM_SENSORES];
         this.sensorDistanciaAlDestino = new double[NUM_SENSORES];
         this.sensorDataLoss = new double[NUM_SENSORES];
+        this.sensorCoste = new double[NUM_SENSORES];
         
               
         matrizDistanciasEntreSensores = new double[NUM_SENSORES][NUM_SENSORES];
@@ -338,6 +356,10 @@ public class EstadoHC{
     
     int getCentrosSize(){
         return this.hijosCentros.size();
+    }
+    
+    public HashMap<Integer, HashSet<Integer>> getRedCentros() {
+        return this.hijosCentros;
     }
     
     public double getDistanciaEntreSensores(int a, int b) {

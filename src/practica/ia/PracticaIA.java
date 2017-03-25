@@ -226,17 +226,20 @@ public class PracticaIA {
         
         sensores = new Sensores(0, 1234);
         
-        sensores.add(new Sensor(1, 1, 1));
-        sensores.add(new Sensor(2, 2, 2));
-        sensores.add(new Sensor(5, 3, 3));
+        sensores.add(new Sensor(1, 2, 1));
+        sensores.add(new Sensor(2, 3, 1));
+        sensores.add(new Sensor(5, 4, 1));
+        sensores.add(new Sensor(2, 5, 1));
         
-        centrosDatos = new CentrosDatos(1, 1234);
+        centrosDatos = new CentrosDatos(0, 1234);
+        centrosDatos.add(new Centro(1, 1));
+        
         estado = new EstadoHC(sensores, centrosDatos);
         estado.generarEstadoInicial();
         
         
         debug();
-        estado.mover(2, 3);
+        //estado.mover(2, 3);
         //estado.mover(2, 11);
         //estado.mover(4, 11);
         //estado.mover(3, 11);
@@ -255,6 +258,11 @@ public class PracticaIA {
         System.out.println("Data Loss: ");
         for (int i = 0; i < estado.getSensorDataIn().length; ++i) {            
             System.out.println("S" + (i+1) + " --> " + estado.getSensorDataLoss()[i]);
+        }
+        
+        System.out.println("Coste: ");
+        for (int i = 0; i < estado.getSensorDataIn().length; ++i) {            
+            System.out.println("S" + (i+1) + " --> " + estado.getSensorCoste()[i]);
         }
         
         
