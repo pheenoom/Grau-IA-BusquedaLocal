@@ -226,17 +226,23 @@ public class PracticaIA {
         
         sensores = new Sensores(0, 1234);
         
-        sensores.add(new Sensor(1, 2, 1));
-        sensores.add(new Sensor(2, 3, 1));
-        sensores.add(new Sensor(5, 4, 1));
-        sensores.add(new Sensor(2, 5, 1));
+        sensores.add(new Sensor(1, 0, 1));
+        sensores.add(new Sensor(1, 1, 2));
+        sensores.add(new Sensor(1, 0, 3));
+        sensores.add(new Sensor(5, 0, 0));        
+        sensores.add(new Sensor(5, 1, 0));        
+        sensores.add(new Sensor(5, 2, 0));
+        
+        //sensores.add(new Sensor(2, 5, 1));
         
         centrosDatos = new CentrosDatos(0, 1234);
-        centrosDatos.add(new Centro(1, 1));
+        centrosDatos.add(new Centro(0, 2));
         
         estado = new EstadoHC(sensores, centrosDatos);
         estado.generarEstadoInicial();
         
+        estado.mover(4, 3);
+        estado.mover(5, 4);
         
         debug();
         //estado.mover(2, 3);
@@ -260,11 +266,21 @@ public class PracticaIA {
             System.out.println("S" + (i+1) + " --> " + estado.getSensorDataLoss()[i]);
         }
         
-        System.out.println("Coste: ");
+        System.out.println("Coste SENSOR: ");
         for (int i = 0; i < estado.getSensorDataIn().length; ++i) {            
             System.out.println("S" + (i+1) + " --> " + estado.getSensorCoste()[i]);
         }
         
+        double coste = 0.0;
+        for (Integer c : estado.getRedCentros().keySet()) {
+            for (Integer s : estado.getRedCentros().get(c)) {
+                coste += estado.getSensorCoste()[s];
+                double aux = Math.pow(estado.getDistanciaSensorACentro(s, c - EstadoHC.NUM_SENSORES),2.0) * estado.getSensorDataOut()[s];
+                coste += aux;
+            }
+        }
+        
+        System.out.println("Coste CENTRO 1: " + coste);
         
         
         /*
