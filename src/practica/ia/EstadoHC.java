@@ -298,10 +298,10 @@ public class EstadoHC{
     }
     
     //Origen siempre ha de ser un sensor
-    public boolean hayCiclos(int origen) {
-        int aux = origen;
+    public boolean hayCiclos(int origen, int futuroDestino) {
+        int aux = futuroDestino;
         
-        while(!esCentro(destinos[aux])){
+        while(!esCentro(aux)){
             aux = destinos[aux];
             if(aux == origen)
                 return true;
@@ -349,7 +349,11 @@ public class EstadoHC{
     //(si se ha formado un nuevo ciclo, 
     //necesariamente ha de pasar por 'sensor' y 'destino')
     public boolean movimientoValido(int sensor, int futuroDestino) {
-        return aceptaConexion(futuroDestino) && sensor != futuroDestino;
+        
+        return destinos[sensor] != futuroDestino 
+                && sensor != futuroDestino
+                && aceptaConexion(futuroDestino) 
+                && !hayCiclos(sensor, futuroDestino);
     }
     
     public boolean intercambioValido(int sensorA, int sensorB){
