@@ -5,9 +5,7 @@
  */
 package practica.ia;
 
-import IA.Red.Centro;
 import IA.Red.CentrosDatos;
-import IA.Red.Sensor;
 import IA.Red.Sensores;
 import aima.search.framework.Problem;
 import aima.search.framework.SearchAgent;
@@ -105,33 +103,7 @@ public class PracticaIA {
             System.out.println();
         }
     }
-    
-    public static void debugPrintRed_i(int indice, int tab) {
-        for (int i = 0; i < tab; ++i) {
-            System.out.print("\t");
-        }
         
-        for (Integer s : estado.getRedSensores().get(indice)) {
-            System.out.println("Sensor " + (s + 1) + ": ");
-            debugPrintRed_i(s,tab);
-        }
-    }
-    
-    public static void debugPrintRed() {
-        System.out.println();
-        System.out.println("Informacion de la red: ");
-        
-        for (int i = 0; i < EstadoHC.NUM_CENTROS; ++i) {
-            System.out.println("##############################################");
-            System.out.println("Centro " + (i + 1) + ", tiene las siguientes conexiones: ");
-            for (Integer s : estado.getHijosCentro(i)) {
-                System.out.println("\tSensor " + (s + 1) + ": ");
-                debugPrintRed_i(s, 2);
-            }
-            System.out.println("##############################################");
-        }
-    }
-    
     public static void debugPrintSensorDestino() {
         System.out.println();
         System.out.println("Informacion de los nodos destino de los sensores");
@@ -142,8 +114,7 @@ public class PracticaIA {
             System.out.println(""+(char)tipoNodoDestinoSensor[nodoDestinoSensor[i]]
                      + (nodoDestinoSensor[i] + 1));
         }
-    }
-    
+    }    
     
     public static void debug() {
         System.out.println("\t\t########################## Debug ##########################\n");
@@ -154,27 +125,6 @@ public class PracticaIA {
         debugPrintSensorDestino();
         System.out.println("\n\t\t########################## Fi Debug ##########################");
     }
-    /*
-    public static void debugHyaCiclos() {
-        ArrayList<Boolean> ciclos = new ArrayList<>();
-        
-        for (int i = 0; i < EstadoHC.NUM_SENSORES; ++i) {
-            ciclos.add(estado.hayCiclos(i));
-        }
-        
-        boolean hayCiclo = false;
-        for (Boolean b : ciclos) {
-            if (b) hayCiclo = true;
-        }
-        
-        if (hayCiclo) {
-            System.out.println("Hay un ciclo!");
-        } 
-        else {
-            System.out.println("No hay ciclos!");
-        }    
-    }
-    */
     
     private static void printInstrumentation(Properties properties) {
         Iterator keys = properties.keySet().iterator();
@@ -220,14 +170,8 @@ public class PracticaIA {
     public static void main(String[] args) {
         long startTime = System.nanoTime();
         
-        sensores = new Sensores(0, 1234);
-        
-        sensores.add(new Sensor(1, 1, 1));
-        sensores.add(new Sensor(2, 1, 2));
-        sensores.add(new Sensor(5, 1, 3));
-                
-        centrosDatos = new CentrosDatos(0, 1234);
-        centrosDatos.add(new Centro(1, 0));
+        sensores = new Sensores(100, 1234);                        
+        centrosDatos = new CentrosDatos(4, 1234);
         
         estado = new EstadoHC(sensores, centrosDatos);
         estado.generarEstadoInicial();
@@ -259,7 +203,7 @@ public class PracticaIA {
             for (int c = 0; c < EstadoHC.NUM_CENTROS; c++) {
                 for (Integer s : estado.getHijosCentro(c)) {
                     coste += estado.getSensorCoste()[s];
-                    double aux = Math.pow(estado.getDistanciaSensorACentro(s, c),2.0) 
+                    double aux = estado.getDistanciaSensorACentro(s, c) 
                             * estado.getSensorDataOut()[s];
                     coste += aux;
                 }
