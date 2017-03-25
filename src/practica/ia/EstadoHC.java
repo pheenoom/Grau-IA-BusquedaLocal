@@ -319,8 +319,7 @@ public class EstadoHC{
     //necesariamente ha de pasar por 'sensor' y 'destino')
     public boolean movimientoValido(int sensor, int futuroDestino) {
         
-        return destinos[sensor] != futuroDestino 
-                && sensor != futuroDestino
+        return  sensor != futuroDestino
                 && aceptaConexion(futuroDestino) 
                 && !hayCiclos(sensor, futuroDestino);
     }
