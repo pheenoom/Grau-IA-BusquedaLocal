@@ -145,23 +145,23 @@ public class PracticaIA {
     
     public static void debugPrintGrafInfo() {
         System.out.println("Data in: ");
-        for (int i = 0; i < estado.getSensorDataIn().length; ++i) {            
-            System.out.println("S" + (i+1) + " --> " + estado.getSensorDataIn()[i]);
+        for (int i = 0; i < estado.getSensorDataInSize(); ++i) {            
+            System.out.println("S" + (i+1) + " --> " + estado.getSensorDataIn(i));
         }
         
         System.out.println("Data out: ");
-        for (int i = 0; i < estado.getSensorDataIn().length; ++i) {            
-            System.out.println("S" + (i+1) + " --> " + estado.getSensorDataOut()[i]);
+        for (int i = 0; i < estado.getSensorDataInSize(); ++i) {            
+            System.out.println("S" + (i+1) + " --> " + estado.getSensorDataOut(i));
         }
         
         System.out.println("Data Loss: ");
-        for (int i = 0; i < estado.getSensorDataIn().length; ++i) {            
-            System.out.println("S" + (i+1) + " --> " + estado.getSensorDataLoss()[i]);
+        for (int i = 0; i < estado.getSensorDataInSize(); ++i) {            
+            System.out.println("S" + (i+1) + " --> " + estado.getSensorDataLoss(i));
         }
         
         System.out.println("Coste SENSOR: ");
-        for (int i = 0; i < estado.getSensorDataIn().length; ++i) {            
-            System.out.println("S" + (i+1) + " --> " + estado.getSensorCoste()[i]);
+        for (int i = 0; i < estado.getSensorDataInSize(); ++i) {            
+            System.out.println("S" + (i+1) + " --> " + estado.getSensorCoste(i));
         }
                 
         System.out.println("Coste inicial: " + calculaCoste(estado));
@@ -202,9 +202,9 @@ public class PracticaIA {
             double coste = 0.0;
             for (int c = 0; c < EstadoHC.NUM_CENTROS; c++) {
                 for (Integer s : estado.getHijosCentro(c)) {
-                    coste += estado.getSensorCoste()[s];
+                    coste += estado.getSensorCoste(s);
                     double aux = estado.getDistanciaSensorACentro(s, c) 
-                            * estado.getSensorDataOut()[s];
+                            * estado.getSensorDataOut(s);
                     coste += aux;
                 }
             }

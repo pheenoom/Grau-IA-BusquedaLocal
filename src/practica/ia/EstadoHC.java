@@ -248,24 +248,28 @@ public class EstadoHC{
         }
     }
     
-    public double[] getSensorDataIn() {
-        return this.sensorDataIn;
+    public double getSensorDataIn(int i) {
+        return this.sensorDataIn[i];
     }
     
-    public double[] getSensorDataOut() {
-        return this.sensorDataOut;
+    public int getSensorDataInSize() {
+        return this.sensorDataIn.length;
     }
     
-    public double[] getSensorDataLoss() {
-        return this.sensorDataLoss;
+    public double getSensorDataOut(int i) {
+        return this.sensorDataOut[i];
     }
     
-    public double[] getSensorCoste() {
-        return this.sensorCoste;
+    public double getSensorDataLoss(int s) {
+        return this.sensorDataLoss[s];
     }
     
-    public double[] getCentroCoste() {
-        return this.centroCoste;
+    public double getSensorCoste(int s) {
+        return this.sensorCoste[s];
+    }
+    
+    public double getCentroCoste(int i) {
+        return this.centroCoste[i];
     }
     
     //Origen siempre ha de ser un sensor

@@ -16,9 +16,10 @@ public class HeuristicFunctionHC implements HeuristicFunction {
         double coste = 0.0;
         for (int c = 0; c < EstadoHC.NUM_CENTROS; c++) {
             for (Integer s : estado.getHijosCentro(c)) {
-                coste += estado.getSensorCoste()[s];
-                coste += estado.getDistanciaSensorACentro(s, c) * estado.getSensorDataOut()[s];
+                coste += estado.getSensorCoste(s);
+                coste += estado.getDistanciaSensorACentro(s, c) * estado.getSensorDataOut(s);
             }
+            
         }
         
         return coste;
