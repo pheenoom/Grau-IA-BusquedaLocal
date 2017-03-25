@@ -197,59 +197,21 @@ public class PracticaIA {
     }
     
     
-    public static void main(String[] args) {
-        /*
-        sensores = new Sensores(5, 1);
-        centrosDatos = new CentrosDatos(1, 1);
-        
-        estado = new EstadoHC(sensores, centrosDatos);
-        estado.generarEstadoInicial();
-        debug();
-      
-        System.out.println("Data in: ");
-        for (Double d : estado.getSensorDataIn()) {
-            System.out.println(d);
-        }
-        
-        System.out.println("Data out: ");
-        for (Double d : estado.getSensorDataOut()) {
-            System.out.println(d);
-        }
-        
-        System.out.println("Distancia: ");
-        for (Double d : estado.getSensorDistanciaAlDestino()) {
-            System.out.println(d);
-        }
-        
-        
-        */
-        
+    public static void main(String[] args) {        
         sensores = new Sensores(0, 1234);
         
-        sensores.add(new Sensor(1, 0, 1));
-        sensores.add(new Sensor(1, 1, 2));
-        sensores.add(new Sensor(1, 0, 3));
-        sensores.add(new Sensor(5, 0, 0));        
-        sensores.add(new Sensor(5, 1, 0));        
-        sensores.add(new Sensor(5, 2, 0));
-        
-        //sensores.add(new Sensor(2, 5, 1));
-        
+        sensores.add(new Sensor(1, 1, 1));
+        sensores.add(new Sensor(2, 1, 2));
+        sensores.add(new Sensor(5, 1, 3));
+                
         centrosDatos = new CentrosDatos(0, 1234);
-        centrosDatos.add(new Centro(0, 2));
+        centrosDatos.add(new Centro(1, 0));
         
         estado = new EstadoHC(sensores, centrosDatos);
         estado.generarEstadoInicial();
         
-        estado.mover(4, 3);
-        estado.mover(5, 4);
         
         debug();
-        //estado.mover(2, 3);
-        //estado.mover(2, 11);
-        //estado.mover(4, 11);
-        //estado.mover(3, 11);
-        //estado.intercambiar(2, 3);
         
         System.out.println("Data in: ");
         for (int i = 0; i < estado.getSensorDataIn().length; ++i) {            
@@ -283,7 +245,7 @@ public class PracticaIA {
         System.out.println("Coste CENTRO 1: " + coste);
         
         
-        /*
+        
         Problem problem = new Problem(  estado, 
                                         new SuccessorFunctionHC(), 
                                         new GoalTestHC(),
@@ -297,7 +259,7 @@ public class PracticaIA {
             printInstrumentation(agent.getInstrumentation());
         } catch (Exception ex) {
             Logger.getLogger(PracticaIA.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
+        }
 
     }    
 }

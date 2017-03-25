@@ -81,7 +81,7 @@ public class EstadoHC{
     private void desconectarAenB(int sensor, int destinoAnterior) {
         if (esCentro(destinoAnterior)) {
             desconectarSensorEnCentro(sensor, destinoAnterior);
-            this.centroCoste[destinoAnterior] -= this.sensorCoste[sensor];
+            this.centroCoste[destinoAnterior - NUM_SENSORES] -= this.sensorCoste[sensor];
         }
         else {            
             desconectarSensorAEnSesnsorB(sensor, destinoAnterior);
@@ -92,7 +92,7 @@ public class EstadoHC{
     private void conectarAenB(int sensor, int nuevoDestino) {
         if (esCentro(nuevoDestino)) {
             conectarSensorEnCentro(sensor, nuevoDestino);
-            this.centroCoste[nuevoDestino] += this.sensorCoste[sensor];
+            this.centroCoste[nuevoDestino - NUM_SENSORES] += this.sensorCoste[sensor];
         }
         else {
             conectarSensorAEnSensorB(sensor, nuevoDestino);
@@ -184,6 +184,12 @@ public class EstadoHC{
         this.hijosSensores = estado.copiaRedSensores();
         this.hijosCentros = estado.copiaRedCentros();
         this.destinos = estado.destinos.clone();
+        this.sensorDataIn = estado.sensorDataIn.clone();
+        this.sensorDataOut = estado.sensorDataOut.clone();
+        this.sensorDistanciaAlDestino = estado.sensorDistanciaAlDestino.clone();
+        this.sensorDataLoss = estado.sensorDataLoss.clone();
+        this.sensorCoste = estado.sensorCoste.clone();
+        this.centroCoste = estado.centroCoste.clone();
     }
     
     public EstadoHC(Sensores sensores, CentrosDatos centros) {

@@ -12,12 +12,16 @@ public class HeuristicFunctionHC implements HeuristicFunction {
     @Override
     public double getHeuristicValue(Object o) {        
         estado = (EstadoHC) o;    
-        double miPutoHeuristico = 0.0;
         
-        for (int i = 0; i < estado.getCentrosSize(); ++i) {
-            
+        double coste = 0.0;
+        for (Integer c : estado.getRedCentros().keySet()) {
+            for (Integer s : estado.getRedCentros().get(c)) {
+                coste += estado.getSensorCoste()[s];
+                double aux = Math.pow(estado.getDistanciaSensorACentro(s, c - EstadoHC.NUM_SENSORES),2.0) * estado.getSensorDataOut()[s];
+                coste += aux;
+            }
         }
         
-        return miPutoHeuristico;
+        return coste;
     }
 }
