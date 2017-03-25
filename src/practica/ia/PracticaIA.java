@@ -12,9 +12,6 @@ import IA.Red.Sensores;
 import aima.search.framework.Problem;
 import aima.search.framework.SearchAgent;
 import aima.search.informed.HillClimbingSearch;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -196,23 +193,7 @@ public class PracticaIA {
         }
     }
     
-    
-    public static void main(String[] args) {        
-        sensores = new Sensores(0, 1234);
-        
-        sensores.add(new Sensor(1, 1, 1));
-        sensores.add(new Sensor(2, 1, 2));
-        sensores.add(new Sensor(5, 1, 3));
-                
-        centrosDatos = new CentrosDatos(0, 1234);
-        centrosDatos.add(new Centro(1, 0));
-        
-        estado = new EstadoHC(sensores, centrosDatos);
-        estado.generarEstadoInicial();
-        
-        
-        debug();
-        
+    public static void debugPrintGrafInfo() {
         System.out.println("Data in: ");
         for (int i = 0; i < estado.getSensorDataIn().length; ++i) {            
             System.out.println("S" + (i+1) + " --> " + estado.getSensorDataIn()[i]);
@@ -234,14 +215,29 @@ public class PracticaIA {
         }
                 
         System.out.println("Coste inicial: " + calculaCoste(estado));
+    }
+    
+    public static void main(String[] args) {
+        long startTime = System.nanoTime();
         
+        sensores = new Sensores(0, 1234);
+        
+        sensores.add(new Sensor(1, 1, 1));
+        sensores.add(new Sensor(2, 1, 2));
+        sensores.add(new Sensor(5, 1, 3));
+                
+        centrosDatos = new CentrosDatos(0, 1234);
+        centrosDatos.add(new Centro(1, 0));
+        
+        estado = new EstadoHC(sensores, centrosDatos);
+        estado.generarEstadoInicial();
         
         
         Problem problem = new Problem(  estado, 
                                         new SuccessorFunctionHC(), 
                                         new GoalTestHC(),
                                         new HeuristicFunctionHC());
-        
+    
         HillClimbingSearch search = new HillClimbingSearch();
         try {
             SearchAgent agent = new SearchAgent(problem, search);  
@@ -249,6 +245,8 @@ public class PracticaIA {
             printActions(agent.getActions());
             printInstrumentation(agent.getInstrumentation());
             EstadoHC estadoFinal =(EstadoHC) search.getGoalState();
+            System.out.println("\t\t################  Tiempo total en milisegundos: " + ((System.nanoTime() - startTime)/1e6) + " ################  ");
+            
             System.out.println("Coste FINAL: " + calculaCoste(estadoFinal));
         } catch (Exception ex) {
             Logger.getLogger(PracticaIA.class.getName()).log(Level.SEVERE, null, ex);

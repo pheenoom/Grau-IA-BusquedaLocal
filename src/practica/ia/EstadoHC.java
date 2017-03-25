@@ -6,7 +6,6 @@ import IA.Red.Sensor;
 import IA.Red.Sensores;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Set;
 
 public class EstadoHC{
     public static final int MAX_CONEXIONES_SENSORES = 1;
@@ -21,112 +20,16 @@ public class EstadoHC{
     private static Sensores sensores;
     
     private int[] destinos;
-    private double[] sensorDistanciaAlDestino;
     private double[] sensorDataIn;
     private double[] sensorDataOut;
     private double[] sensorDataLoss;
     private double[] sensorCoste;
     private double[] centroCoste;
+    
     private HashMap<Integer,HashSet<Integer>> hijosSensores;
     //En general, el indice de los centros es su numero + numero de sensores
     private HashMap<Integer,HashSet<Integer>> hijosCentros;
     
-    ////
-        
-    public void reCalcularDades(int indiceSensor) {
-        while (!esCentro(indiceSensor)) {
-            double tmpDataIn = 0.0;
-            
-            double tmpCoste = 0.0;
-            for (Integer s : this.hijosSensores.get(indiceSensor)) {
-                tmpDataIn += this.sensorDataOut[s];
-                tmpCoste += this.sensorCoste[s];
-                
-                double d = matrizDistanciasEntreSensores[indiceSensor][s];
-                tmpCoste += (Math.pow(d, 2.0) * this.sensorDataOut[s]);
-            }
-
-            double capacidadSensorDestino = sensores.get(indiceSensor).getCapacidad() * 2.0;
-            if (tmpDataIn > capacidadSensorDestino) {
-                this.sensorDataOut[indiceSensor] = capacidadSensorDestino * 1.5;
-                this.sensorDataLoss[indiceSensor] = tmpDataIn - capacidadSensorDestino;
-            }
-            else {
-                this.sensorDataOut[indiceSensor] = tmpDataIn + capacidadSensorDestino * 0.5;
-                this.sensorDataLoss[indiceSensor] = 0.0;
-            }
-            this.sensorDataIn[indiceSensor] = tmpDataIn;
-            this.sensorCoste[indiceSensor] = tmpCoste;
-            int indiceDestino = this.destinos[indiceSensor];
-            
-            
-            /*
-            int indiceDestino = this.destinos[indiceSensor];
-            if (!esCentro(this.destinos[indiceSensor])) {
-                double d = matrizDistanciasEntreSensores[indiceSensor][indiceDestino];
-                double tmpCoste = (Math.pow(d, 2.0) * this.sensorDataOut[indiceSensor]);
-                this.sensorCoste[indiceDestino] += tmpCoste + this.sensorCoste[indiceSensor];                
-            }
-            else {
-                double d = matrizDistanciasSensoresACentro[indiceSensor][indiceDestino - NUM_SENSORES];
-                double tmpCoste = (Math.pow(d, 2.0) * this.sensorDataOut[indiceSensor]);
-                this.centroCoste[indiceDestino - NUM_SENSORES] += tmpCoste + this.sensorCoste[indiceSensor];
-            }*/
-            
-            indiceSensor = indiceDestino;
-        }
-    }
-    
-      
-    private void desconectarAenB(int sensor, int destinoAnterior) {
-        if (esCentro(destinoAnterior)) {
-            desconectarSensorEnCentro(sensor, destinoAnterior);
-            this.centroCoste[destinoAnterior - NUM_SENSORES] -= this.sensorCoste[sensor];
-        }
-        else {            
-            desconectarSensorAEnSesnsorB(sensor, destinoAnterior);
-            reCalcularDades(destinoAnterior);
-        }
-    }
-
-    private void conectarAenB(int sensor, int nuevoDestino) {
-        if (esCentro(nuevoDestino)) {
-            conectarSensorEnCentro(sensor, nuevoDestino);
-            this.centroCoste[nuevoDestino - NUM_SENSORES] += this.sensorCoste[sensor];
-        }
-        else {
-            conectarSensorAEnSensorB(sensor, nuevoDestino);
-            reCalcularDades(sensor);            
-        }        
-    }
-    
-    
-    public double[] getSensorDataIn() {
-        return this.sensorDataIn;
-    }
-    
-    public double[] getSensorDataOut() {
-        return this.sensorDataOut;
-    }
-    
-    public double[] getSensorDistanciaAlDestino() {
-        return this.sensorDistanciaAlDestino;
-    }
-    
-    public double[] getSensorDataLoss() {
-        return this.sensorDataLoss;
-    }
-    
-    public double[] getSensorCoste() {
-        return this.sensorCoste;
-    }
-    
-    public double[] getCentroCoste() {
-        return this.centroCoste;
-    }
-    
-    ////
-
     ////////////////////////////////////////////////////////////////////////////
     ///                         Metodos privados                             ///
     ////////////////////////////////////////////////////////////////////////////
@@ -167,6 +70,59 @@ public class EstadoHC{
         }
     }
     
+    private void reCalcularDades(int indiceSensor) {
+        while (!esCentro(indiceSensor)) {
+            double tmpDataIn = 0.0;
+            
+            double tmpCoste = 0.0;
+            for (Integer s : this.hijosSensores.get(indiceSensor)) {
+                tmpDataIn += this.sensorDataOut[s];
+                tmpCoste += this.sensorCoste[s];
+                
+                double d = matrizDistanciasEntreSensores[indiceSensor][s];
+                tmpCoste += (Math.pow(d, 2.0) * this.sensorDataOut[s]);
+            }
+
+            double capacidadSensorDestino = sensores.get(indiceSensor).getCapacidad() * 2.0;
+            if (tmpDataIn > capacidadSensorDestino) {
+                this.sensorDataOut[indiceSensor] = capacidadSensorDestino * 1.5;
+                this.sensorDataLoss[indiceSensor] = tmpDataIn - capacidadSensorDestino;
+            }
+            else {
+                this.sensorDataOut[indiceSensor] = tmpDataIn + capacidadSensorDestino * 0.5;
+                this.sensorDataLoss[indiceSensor] = 0.0;
+            }
+            this.sensorDataIn[indiceSensor] = tmpDataIn;
+            this.sensorCoste[indiceSensor] = tmpCoste;
+            int indiceDestino = this.destinos[indiceSensor];        
+    
+            
+            indiceSensor = indiceDestino;
+        }
+    }
+          
+    private void desconectarAenB(int sensor, int destinoAnterior) {
+        if (esCentro(destinoAnterior)) {
+            desconectarSensorEnCentro(sensor, destinoAnterior);
+            this.centroCoste[destinoAnterior - NUM_SENSORES] -= this.sensorCoste[sensor];
+        }
+        else {            
+            desconectarSensorAEnSesnsorB(sensor, destinoAnterior);
+            reCalcularDades(destinoAnterior);
+        }
+    }
+
+    private void conectarAenB(int sensor, int nuevoDestino) {
+        if (esCentro(nuevoDestino)) {
+            conectarSensorEnCentro(sensor, nuevoDestino);
+            this.centroCoste[nuevoDestino - NUM_SENSORES] += this.sensorCoste[sensor];
+        }
+        else {
+            conectarSensorAEnSensorB(sensor, nuevoDestino);
+            reCalcularDades(sensor);            
+        }        
+    }
+    
     private boolean esCentro(int indice) {
         return indice >= NUM_SENSORES;
     }
@@ -186,7 +142,6 @@ public class EstadoHC{
         this.destinos = estado.destinos.clone();
         this.sensorDataIn = estado.sensorDataIn.clone();
         this.sensorDataOut = estado.sensorDataOut.clone();
-        this.sensorDistanciaAlDestino = estado.sensorDistanciaAlDestino.clone();
         this.sensorDataLoss = estado.sensorDataLoss.clone();
         this.sensorCoste = estado.sensorCoste.clone();
         this.centroCoste = estado.centroCoste.clone();
@@ -206,7 +161,6 @@ public class EstadoHC{
         this.destinos = new int[NUM_SENSORES];
         this.sensorDataIn = new double[NUM_SENSORES];
         this.sensorDataOut = new double[NUM_SENSORES];
-        this.sensorDistanciaAlDestino = new double[NUM_SENSORES];
         this.sensorDataLoss = new double[NUM_SENSORES];
         this.sensorCoste = new double[NUM_SENSORES];
         this.centroCoste = new double[NUM_CENTROS];
@@ -284,7 +238,6 @@ public class EstadoHC{
             this.destinos[indiceSensor] = padre;            
             this.hijosSensores.get(padre).add(indiceSensor);
             this.sensorDataOut[indiceSensor] = sensores.get(indiceSensor).getCapacidad();
-            this.sensorDistanciaAlDestino[indiceSensor] = matrizDistanciasEntreSensores[indiceSensor][padre];
             
             ++indiceSensor;
             ++padre;
@@ -295,6 +248,26 @@ public class EstadoHC{
                 reCalcularDades(i);                
             }
         }
+    }
+    
+        public double[] getSensorDataIn() {
+        return this.sensorDataIn;
+    }
+    
+    public double[] getSensorDataOut() {
+        return this.sensorDataOut;
+    }
+    
+    public double[] getSensorDataLoss() {
+        return this.sensorDataLoss;
+    }
+    
+    public double[] getSensorCoste() {
+        return this.sensorCoste;
+    }
+    
+    public double[] getCentroCoste() {
+        return this.centroCoste;
     }
     
     //Origen siempre ha de ser un sensor
