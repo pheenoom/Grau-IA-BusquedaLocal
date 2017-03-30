@@ -21,13 +21,24 @@ public class SuccessorFunctionHC implements SuccessorFunction{
     public List getSuccessors(Object o) {
         EstadoHC estado = (EstadoHC) o;
         ArrayList estadosGenerados = new ArrayList();
+        
         //Por cada sensor
         for (int origen = 0; origen < EstadoHC.NUM_SENSORES; ++origen) {
             //sensor x sensor
             for (int destino = 0; destino < EstadoHC.NUM_SENSORES; ++destino) {
                 if (destino != origen) 
                 {
-                    if (estado.movimientoValido(origen, destino)) 
+
+                    if (estado.intercambioValido(origen, destino))
+                    {
+                        EstadoHC nuevoEstadoIntercambiar = new EstadoHC(estado);
+                        nuevoEstadoIntercambiar.intercambiar(origen, destino);
+                        estadosGenerados.add(new Successor(
+                                "Intercambio el Sensor " + (origen + 1) 
+                                + " con el sensor " + (destino + 1),
+                                nuevoEstadoIntercambiar)); 
+                    }/*
+                    else if (estado.movimientoValido(origen, destino)) 
                     {                        
                         EstadoHC nuevoEstadoMover = new EstadoHC(estado);
                         nuevoEstadoMover.mover(origen, destino);
@@ -35,9 +46,11 @@ public class SuccessorFunctionHC implements SuccessorFunction{
                                 "Conecto el Sensor " + (origen + 1) 
                                 + " al sensor " + (destino + 1),
                                 nuevoEstadoMover));
-                    }
+                    }*/
+                    
                 }
             }
+            
             //sensor x centro
             for (int destino = 0; destino < EstadoHC.NUM_CENTROS; ++destino) 
             {   
@@ -49,7 +62,7 @@ public class SuccessorFunctionHC implements SuccessorFunction{
                             "Conecto el Sensor " + (origen + 1) 
                             + " al centro " + (destino + 1),
                             nuevoEstado));
-                }                
+                }
             }
         }
         

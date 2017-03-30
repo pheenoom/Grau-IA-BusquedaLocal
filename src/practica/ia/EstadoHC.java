@@ -4,8 +4,11 @@ import IA.Red.Centro;
 import IA.Red.CentrosDatos;
 import IA.Red.Sensor;
 import IA.Red.Sensores;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Random;
 
 public class EstadoHC{
     public static final int MAX_CONEXIONES_SENSORES = 3;
@@ -24,7 +27,6 @@ public class EstadoHC{
     private double[] sensorDataOut;
     private double[] sensorDataLoss;
     private double[] sensorCoste;
-    private double[] centroCoste;
     
     private HashMap<Integer,HashSet<Integer>> hijosSensores;
     //En general, el indice de los centros es su numero + numero de sensores
@@ -106,7 +108,6 @@ public class EstadoHC{
     private void desconectarAenB(int sensor, int destinoAnterior) {
         if (esCentro(destinoAnterior)) {
             desconectarSensorEnCentro(sensor, destinoAnterior);
-            this.centroCoste[destinoAnterior - NUM_SENSORES] -= this.sensorCoste[sensor];
         }
         else {            
             desconectarSensorAEnSesnsorB(sensor, destinoAnterior);
@@ -117,7 +118,6 @@ public class EstadoHC{
     private void conectarAenB(int sensor, int nuevoDestino) {
         if (esCentro(nuevoDestino)) {
             conectarSensorEnCentro(sensor, nuevoDestino);
-            this.centroCoste[nuevoDestino - NUM_SENSORES] += this.sensorCoste[sensor];
         }
         else {
             conectarSensorAEnSensorB(sensor, nuevoDestino);
@@ -141,15 +141,14 @@ public class EstadoHC{
         this.sensorDataOut = estado.sensorDataOut.clone();
         this.sensorDataLoss = estado.sensorDataLoss.clone();
         this.sensorCoste = estado.sensorCoste.clone();
-        this.centroCoste = estado.centroCoste.clone();
     }
     
-    public EstadoHC(Sensores sensores, CentrosDatos centros) {
-        NUM_SENSORES = sensores.size();
-        NUM_CENTROS = centros.size();
+    public EstadoHC(Sensores redSensores, CentrosDatos redCentros) {
+        NUM_SENSORES = redSensores.size();
+        NUM_CENTROS = redCentros.size();
         
-        this.centros = centros;
-        this.sensores = sensores;
+        centros = redCentros;
+        sensores = redSensores;
         
         this.hijosSensores = new HashMap<>();
         this.hijosCentros = new HashMap<>();
@@ -160,7 +159,6 @@ public class EstadoHC{
         this.sensorDataOut = new double[NUM_SENSORES];
         this.sensorDataLoss = new double[NUM_SENSORES];
         this.sensorCoste = new double[NUM_SENSORES];
-        this.centroCoste = new double[NUM_CENTROS];
         
               
         matrizDistanciasEntreSensores = new double[NUM_SENSORES][NUM_SENSORES];
@@ -200,7 +198,40 @@ public class EstadoHC{
         return copia;
     }
     
-    public void generarEstadoInicial() {
+    public void generarEstadoInicialRandom() {
+        int indiceSensor = 0;
+        Random random = new Random();
+        while (indiceSensor < NUM_SENSORES) {
+            int indiceDestino = 0;
+            boolean encontroPadre = false;
+            
+            while (!encontroPadre) {
+                boolean esCentro = random.nextBoolean();
+                
+                if (esCentro) {
+                    indiceDestino = random.nextInt(NUM_CENTROS) + NUM_SENSORES;
+                    if (centroAceptaConexion(indiceDestino)) {
+                        this.hijosCentros.get(indiceDestino).add(indiceSensor);
+                        encontroPadre = true;
+                    }    
+                }                
+                else if (!esCentro || !encontroPadre) {
+                    indiceDestino = random.nextInt(NUM_SENSORES - 1);
+                    if (sensorAceptaConexion(indiceSensor)) {
+                        this.hijosSensores.get(indiceDestino).add(indiceSensor);
+                        encontroPadre = true;
+                    }
+                }
+            }
+            
+            this.destinos[indiceSensor] = indiceDestino;
+            this.sensorDataOut[indiceSensor] = sensores.get(indiceSensor).getCapacidad();
+            
+            ++indiceSensor;
+        }
+    }
+    
+    public void generarEstadoInicialGreedy() {
         int indiceSensor = 0;
         //Los centros estan en el rango [NUM_SENSORES, NUM_SENSORES + NUM_CENTROS)
         int indiceCentro = NUM_SENSORES;
@@ -249,30 +280,25 @@ public class EstadoHC{
         }
     }
     
-    public double getSensorDataIn(int i) {
-        return this.sensorDataIn[i];
+    public void generarEstadoInicialOrdenado(boolean ascendiente) {
+        Collections.sort(sensores, (Sensor s1, Sensor s2) -> {
+            if (s1.getCapacidad() == s2.getCapacidad()) {
+                return 0;
+            }
+            else if (ascendiente && s1.getCapacidad() < s2.getCapacidad()) {
+                return 1;
+            }
+            else if (!ascendiente && s1.getCapacidad() < s2.getCapacidad()) {
+                return 1;
+            }
+            else {
+                return -1;
+            }
+        });
+        
+        this.generarEstadoInicialGreedy();
     }
-    
-    public int getSensorDataInSize() {
-        return this.sensorDataIn.length;
-    }
-    
-    public double getSensorDataOut(int i) {
-        return this.sensorDataOut[i];
-    }
-    
-    public double getSensorDataLoss(int s) {
-        return this.sensorDataLoss[s];
-    }
-    
-    public double getSensorCoste(int s) {
-        return this.sensorCoste[s];
-    }
-    
-    public double getCentroCoste(int i) {
-        return this.centroCoste[i];
-    }
-    
+        
     //Origen siempre ha de ser un sensor
     public boolean hayCiclos(int origen, int futuroDestino) {
         int aux = futuroDestino;
@@ -289,6 +315,21 @@ public class EstadoHC{
     public void mover(int sensor, int nuevoDestino) {        
         desconectarAenB(sensor, destinos[sensor]);
         conectarAenB(sensor, nuevoDestino);
+    }   
+    
+    public void intercambiar(int sensorA, int sensorB){
+        int destinoA = destinos[sensorA];
+        int destinoB = destinos[sensorB];
+        mover(sensorA, destinoB);
+        mover(sensorB, destinoA);
+    }
+    
+    public void intercambiarCentro(int centroA, int centroB) {
+        HashSet<Integer> hijosA = this.hijosCentros.get(centroA);
+        HashSet<Integer> hijosB = this.hijosCentros.get(centroB);
+        
+        this.hijosCentros.put(centroA,hijosB);
+        this.hijosCentros.put(centroB,hijosA);        
     }
     
     private void desconectarSensorAEnSesnsorB(int a, int b) {
@@ -310,20 +351,12 @@ public class EstadoHC{
         this.hijosCentros.get(c).add(s);
         this.destinos[s] = c;
     }
-  
-    public void intercambiar(int sensorA, int sensorB){
-        int destinoA = destinos[sensorA];
-        int destinoB = destinos[sensorB];
-        mover(sensorA, destinoB);
-        mover(sensorB, destinoA);
-    }
-    
+      
     //Se ha "movido sensor", por lo tanto hay que comprobar que su nuevo
     //destino acepta conexiones y que no se ha formado un ciclo 
     //(si se ha formado un nuevo ciclo, 
     //necesariamente ha de pasar por 'sensor' y 'destino')
-    public boolean movimientoValido(int sensor, int futuroDestino) {
-        
+    public boolean movimientoValido(int sensor, int futuroDestino) {        
         return  sensor != futuroDestino
                 && aceptaConexion(futuroDestino) 
                 && !hayCiclos(sensor, futuroDestino);
@@ -374,28 +407,9 @@ public class EstadoHC{
     public double getDistanciaSensorACentro(int s, int c) {
         return matrizDistanciasSensoresACentro[s][c];
     }
-    
-    public byte[] getTipos() {
-        byte[] tipos = new byte[NUM_SENSORES+NUM_CENTROS];
-        for(int i = 0; i < NUM_SENSORES; i++)
-            tipos[i] = (byte)'S';
-        
-        for(int i = NUM_SENSORES; i < NUM_CENTROS+NUM_SENSORES; i++)
-            tipos[i] = (byte)'C';
-        
-        return tipos;
-    }
-    
+
     public int[] getDestinos() {
         return this.destinos;
-    }
-    
-    public Sensores getSensores() {
-        return sensores;
-    }
-    
-    public CentrosDatos getCentros() {
-        return centros;
     }
 
     Iterable<Integer> getHijosCentro(int i) {
@@ -406,4 +420,24 @@ public class EstadoHC{
         return num_centro+NUM_SENSORES;
     }
 
+      public double getSensorDataIn(int i) {
+        return this.sensorDataIn[i];
+    }
+    
+    public int getSensorDataInSize() {
+        return this.sensorDataIn.length;
+    }
+    
+    public double getSensorDataOut(int i) {
+        return this.sensorDataOut[i];
+    }
+    
+    public double getSensorDataLoss(int s) {
+        return this.sensorDataLoss[s];
+    }
+    
+    public double getSensorCoste(int s) {
+        return this.sensorCoste[s];
+    }
+    
 }
