@@ -1,0 +1,1 @@
+Simulated Annealing - K: 1, Lambda: 0.001, Steps: 10000

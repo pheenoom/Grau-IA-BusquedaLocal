@@ -29,16 +29,7 @@ public class SuccessorFunctionHC implements SuccessorFunction{
                 if (destino != origen) 
                 {
 
-                    if (estado.intercambioValido(origen, destino))
-                    {
-                        EstadoHC nuevoEstadoIntercambiar = new EstadoHC(estado);
-                        nuevoEstadoIntercambiar.intercambiar(origen, destino);
-                        estadosGenerados.add(new Successor(
-                                "Intercambio el Sensor " + (origen + 1) 
-                                + " con el sensor " + (destino + 1),
-                                nuevoEstadoIntercambiar)); 
-                    }/*
-                    else if (estado.movimientoValido(origen, destino)) 
+                    if (estado.movimientoValido(origen, destino)) 
                     {                        
                         EstadoHC nuevoEstadoMover = new EstadoHC(estado);
                         nuevoEstadoMover.mover(origen, destino);
@@ -46,8 +37,16 @@ public class SuccessorFunctionHC implements SuccessorFunction{
                                 "Conecto el Sensor " + (origen + 1) 
                                 + " al sensor " + (destino + 1),
                                 nuevoEstadoMover));
-                    }*/
-                    
+                    }
+                    else if (estado.intercambioValido(origen, destino))
+                    {
+                        EstadoHC nuevoEstadoIntercambiar = new EstadoHC(estado);
+                        nuevoEstadoIntercambiar.intercambiar(origen, destino);
+                        estadosGenerados.add(new Successor(
+                                "Intercambio el Sensor " + (origen + 1) 
+                                + " con el sensor " + (destino + 1),
+                                nuevoEstadoIntercambiar)); 
+                    }                                        
                 }
             }
             

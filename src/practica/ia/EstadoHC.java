@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class EstadoHC{
     public static final int MAX_CONEXIONES_SENSORES = 3;
@@ -198,26 +199,27 @@ public class EstadoHC{
         return copia;
     }
     
+
+    
     public void generarEstadoInicialRandom() {
         int indiceSensor = 0;
-        Random random = new Random();
         while (indiceSensor < NUM_SENSORES) {
             int indiceDestino = 0;
             boolean encontroPadre = false;
             
             while (!encontroPadre) {
-                boolean esCentro = random.nextBoolean();
+                boolean esCentro = ThreadLocalRandom.current().nextBoolean();
                 
                 if (esCentro) {
-                    indiceDestino = random.nextInt(NUM_CENTROS) + NUM_SENSORES;
+                    indiceDestino = ThreadLocalRandom.current().nextInt(NUM_SENSORES, NUM_CENTROS + NUM_SENSORES);
                     if (centroAceptaConexion(indiceDestino)) {
                         this.hijosCentros.get(indiceDestino).add(indiceSensor);
                         encontroPadre = true;
                     }    
                 }                
-                else if (!esCentro || !encontroPadre) {
-                    indiceDestino = random.nextInt(NUM_SENSORES - 1);
-                    if (sensorAceptaConexion(indiceSensor)) {
+                else if (!esCentro|| !encontroPadre) {
+                    indiceDestino = ThreadLocalRandom.current().nextInt(0, indiceSensor + 1);
+                    if (movimientoValido(indiceSensor, indiceDestino)) {
                         this.hijosSensores.get(indiceDestino).add(indiceSensor);
                         encontroPadre = true;
                     }
@@ -228,6 +230,12 @@ public class EstadoHC{
             this.sensorDataOut[indiceSensor] = sensores.get(indiceSensor).getCapacidad();
             
             ++indiceSensor;
+        }
+        
+        for (int i = 0; i < NUM_SENSORES; ++i) {
+            if (this.hijosSensores.get(i).isEmpty()) {
+                reCalcularDades(i);                
+            }         
         }
     }
     
@@ -288,7 +296,7 @@ public class EstadoHC{
             else if (ascendiente && s1.getCapacidad() < s2.getCapacidad()) {
                 return 1;
             }
-            else if (!ascendiente && s1.getCapacidad() < s2.getCapacidad()) {
+            else if (!ascendiente && s1.getCapacidad() > s2.getCapacidad()) {
                 return 1;
             }
             else {

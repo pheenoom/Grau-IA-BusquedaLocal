@@ -11,6 +11,9 @@ import aima.search.framework.Problem;
 import aima.search.framework.SearchAgent;
 import aima.search.informed.HillClimbingSearch;
 import aima.search.informed.SimulatedAnnealingSearch;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -79,6 +82,7 @@ public class PracticaIA {
             
             // Generador de estado Greedy
             System.out.println("Generador de estados greedy");
+            System.out.println("Tiempo (ms);Nodos;Coste Inicial;Coste Final");
             for (int i = 0; i < 10; ++i) {
                     long tiempoInicial = System.nanoTime();
 
@@ -109,6 +113,7 @@ public class PracticaIA {
             }
             
             System.out.println("Generador de estados greedy con ordenacion ascendiente");
+            System.out.println("Tiempo (ms);Nodos;Coste Inicial;Coste Final");
             // Generador de estado Greedy con ordenacion ascendiente
             for (int i = 0; i < 10; ++i) {
                     long tiempoInicial = System.nanoTime();
@@ -141,6 +146,7 @@ public class PracticaIA {
             
             // Generador de estado Greedy con ordenacion descendiente
             System.out.println("Generador de estados greedy con ordenacion descendiente");
+            System.out.println("Tiempo (ms);Nodos;Coste Inicial;Coste Final");
             for (int i = 0; i < 10; ++i) {
                     long tiempoInicial = System.nanoTime();
 
@@ -171,6 +177,7 @@ public class PracticaIA {
             }
             
             System.out.println("Generador de estados random");
+            System.out.println("Tiempo (ms);Nodos;Coste Inicial;Coste Final");
             for (int i = 0; i < 10; ++i) {
                 for (int j = 0; j< 5; ++j) {
                     long tiempoInicial = System.nanoTime();
@@ -207,60 +214,61 @@ public class PracticaIA {
         }
     }*/
     
+    
         // Cuantos pasos voy hacer, cuanto mas grande es el numeror mejor es la solucion
     // K = cuanta velocidad tengo que empezar a saltar menos. K mayor es mas estricto es, mas rapido cae la aleatoridad.
     // lambda = propabilidad de cojer un estado. lambda mas pequeño , la probabilidad de cojer uno malo es menor.
     // 
     
     // Experimento 3
-    /*
+    
     public static void main(String[] args) {        
         try {
-            int steps = 1000;
-            int stiter = 10;
-            int k = 100;
-            double lamb = 0.03;
+            int steps = 10000;
+            int stiter = 200;
+            int k = 300;
+            double lamb = 0.007;
+            int i = 19;
             
             int semillasSensor[] = {1143, 2985, 9847, 8417, 8814, 3954, 2901, 2134, 3911, 2242};
             int semillasCentros[] = {9180, 8855, 8580, 4110, 2608, 9290, 4591, 5956, 7715, 8908};
-            //for (int i = 0; i < 10; ++i) {
-                System.out.println("Semilla Sensor: " + semillasSensor[0]);
-                System.out.println("Semilla Centro: " + semillasCentros[0]);
-                long tiempoInicial = System.nanoTime();
+                        
+            long tiempoInicial = System.nanoTime();
+            
+            Sensores sensores = new Sensores(NUM_SENSORES, semillasSensor[0]);
+            CentrosDatos centrosDatos = new CentrosDatos(NUM_CENTROS, semillasCentros[0]);
 
-                Sensores sensores = new Sensores(NUM_SENSORES, semillasSensor[0]);
-                CentrosDatos centrosDatos = new CentrosDatos(NUM_CENTROS, semillasCentros[0]);
+            EstadoHC estado = new EstadoHC(sensores, centrosDatos);
+            estado.generarEstadoInicialGreedy();
 
-                EstadoHC estado = new EstadoHC(sensores, centrosDatos);
-                estado.generarEstadoInicialGreedy();
+            double costeInicial = calculaCoste(estado);
+            double perdidasInicial = calculaPerdidas(estado);
 
-                System.out.println("Coste Inicial: " + calculaCoste(estado));
-                System.out.println("Perdidas Inicial: " + calculaPerdidas(estado));
+            Problem problem = new Problem(  estado, 
+                                            new SuccessorFunctionSA(), 
+                                            new GoalTestHC(),
+                                            new HeuristicFunctionHC());
 
-                Problem problem = new Problem(  estado, 
-                                                new SuccessorFunctionHC(), 
-                                                new GoalTestHC(),
-                                                new HeuristicFunctionHC());
-
-                SimulatedAnnealingSearch search = new SimulatedAnnealingSearch(steps, stiter, k, lamb);
-                //HillClimbingSearch search = new HillClimbingSearch();
-                SearchAgent agent = new SearchAgent(problem, search);  
-
-                printInstrumentation(agent.getInstrumentation());
-                System.out.println("Tiempo total en milisegundos: " + ((System.nanoTime() - tiempoInicial)/1e6));
-
-                EstadoHC estadoFinal =(EstadoHC) search.getGoalState();            
-                System.out.println("Coste FINAL: " + calculaCoste(estadoFinal));
-                System.out.println("Perdidas FINAL: " + calculaPerdidas(estadoFinal));
-                System.out.println("--------------------------------------------------------------------");       
-           // }
+            SimulatedAnnealingSearch search = new SimulatedAnnealingSearch(steps, stiter, k, lamb);
+            SearchAgent agent = new SearchAgent(problem, search);  
+            double tiempo = (System.nanoTime() - tiempoInicial)/1e6;
+            
+            EstadoHC estadoFinal =(EstadoHC) search.getGoalState();
+            
+            BufferedWriter writer = new BufferedWriter(new FileWriter(new File("resultados_" + i + ".txt")));
+            writer.write("Simulated Annealing - K: " + k + ", Lambda: " + lamb + ", Steps: " + steps + " Coste inicial: " + costeInicial + 
+                    " perdidasInicial: " + perdidasInicial + 
+                    " Tiempo: " + tiempo + 
+                    " Coste Final: " + calculaCoste(estadoFinal) +
+                    " Perdida Final: " + calculaPerdidas(estadoFinal));
+            writer.close();
         } catch (Exception ex) {
             Logger.getLogger(PracticaIA.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    */
     
-    // Experimento 4    
+    // Experimento 4   
+    /*
     public static void main(String[] args) {        
         try {
             int semillasSensor[] = {1143, 2985, 9847, 8417, 8814, 3954, 2901, 2134, 3911, 2242};
@@ -299,6 +307,7 @@ public class PracticaIA {
             Logger.getLogger(PracticaIA.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+*/
     
         
     

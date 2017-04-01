@@ -1,0 +1,1 @@
+Coste inicial: 969535.0 perdidasInicial: 0.0 Tiempo: 744.613351 Coste Final: 241755.0 Perdida Final: 0.0

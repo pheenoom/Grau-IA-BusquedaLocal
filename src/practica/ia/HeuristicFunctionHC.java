@@ -30,9 +30,9 @@ public class HeuristicFunctionHC implements HeuristicFunction {
             {
                 perdidas += dataIn-150;
             }
-        }
-           
+        }           
         
-        return coste * COSTE_PERDIDA + perdidas * (1-COSTE_PERDIDA);
+        double h = coste * COSTE_PERDIDA + perdidas * (1-COSTE_PERDIDA);        
+        return h;
     }
 }
