@@ -46,7 +46,7 @@ public class SuccessorFunctionHC implements SuccessorFunction{
                                 "Intercambio el Sensor " + (origen + 1) 
                                 + " con el sensor " + (destino + 1),
                                 nuevoEstadoIntercambiar)); 
-                    }                                        
+                    }                                      
                 }
             }
             
