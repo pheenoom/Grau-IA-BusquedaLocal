@@ -11,14 +11,9 @@ import aima.search.framework.Problem;
 import aima.search.framework.SearchAgent;
 import aima.search.informed.HillClimbingSearch;
 import aima.search.informed.SimulatedAnnealingSearch;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Scanner;
 
 public class PracticaIA {    
     public static final int NUM_SENSORES    = 100;
@@ -33,16 +28,79 @@ public class PracticaIA {
         }
 
     }
-    
-    private static void printActions(List actions) {
-        System.out.println("Camino hacia la solucion: ");
-        for (int i = 0; i < actions.size(); i++) {
-            String action = actions.get(i).toString();
-            System.out.println(action);
-        }
+    /*
+    public static void main(String[] args) throws Exception {        
+        int opcionMenu = 0;
+        Scanner keyboard = new Scanner(System.in);
+        int numeroCentros = 4;
+        int numeroSensores = 100;
+        while (opcionMenu != 4) {
+            System.out.println("Escenario: " + numeroSensores + " sensores y " + numeroCentros + " centros de datos");
+            System.out.println("Opciones del menu: ");
+            System.out.println("1.- Ejecutar el Hill Climbing");
+            System.out.println("2.- Ejecutar el Simulated Annealing");
+            System.out.println("3.- Modificar escenario");
+            System.out.println("4.- Salir");
+            opcionMenu = keyboard.nextInt();
+            
+            if (opcionMenu == 3) {
+                System.out.println("Escirbe el numero de sensores: ");
+                numeroSensores = keyboard.nextInt();
+                System.out.println("Escribe el numero de centros: ");
+                numeroCentros = keyboard.nextInt();
+            }
+            else if (opcionMenu != 4) {
+                int semillasSensor[] = {1143, 2985, 9847, 8417, 8814, 3954, 2901, 2134, 3911, 2242};
+                int semillasCentros[] = {9180, 8855, 8580, 4110, 2608, 9290, 4591, 5956, 7715, 8908};
+                System.out.println("Se ejecutara el problema con 10 semillas diferentes.");
+                for (int i = 0; i < 10; ++i) {
+                    System.out.println("Semilla sensor: " + semillasSensor[i] + ", semilla centro: " + semillasCentros[i]);
+                    long tiempoInicial = System.nanoTime();
 
-        //System.out.println((String)actions.get(actions.size()-1));
-    }
+                    Sensores sensores = new Sensores(numeroSensores, semillasSensor[i]);
+                    CentrosDatos centrosDatos = new CentrosDatos(numeroCentros, semillasCentros[i]);
+
+                    EstadoHC estado = new EstadoHC(sensores, centrosDatos);
+                    estado.generarEstadoInicialGreedy();
+
+                    System.out.println("Coste inicial: " + calculaCoste(estado));
+                    System.out.println("Perdidas finales: " + calculaPerdidas(estado));
+
+                    Problem problem;
+                    SearchAgent agent;
+                    EstadoHC estadoFinal;
+                    if (opcionMenu == 1) {
+                        System.out.println("Se esta ejecutando el Hill Climbing");
+                        problem = new Problem(  estado, 
+                                                new SuccessorFunctionHC(), 
+                                                new GoalTestHC(),
+                                                new HeuristicFunctionHC());
+                        HillClimbingSearch search = new HillClimbingSearch();
+                        agent = new SearchAgent(problem, search);
+                        estadoFinal = (EstadoHC) search.getGoalState();
+                    }
+                    else {
+                        System.out.println("Se esta ejecutando el simulated Annealing con los parametros ideales ");
+                        problem = new Problem(  estado, 
+                                                new SuccessorFunctionSA(), 
+                                                new GoalTestHC(),
+                                                new HeuristicFunctionHC());
+                        
+                        SimulatedAnnealingSearch search = new SimulatedAnnealingSearch(i, i, i, i);
+                        agent = new SearchAgent(problem, search);
+                        estadoFinal = (EstadoHC) search.getGoalState();
+                    }
+
+                    printInstrumentation(agent.getInstrumentation());
+                    System.out.println("Tiempo en ms: " + ((System.nanoTime() - tiempoInicial)/1e6));
+
+                    System.out.println("Coste final: " + calculaCoste(estadoFinal));
+                    System.out.println("Perdidas finales: " + calculaPerdidas(estadoFinal));
+                    System.out.println("------------------------------------------------------");
+                }
+            }
+        }
+    }*/
     
     // Experimento 1
     /*
@@ -366,54 +424,51 @@ public class PracticaIA {
     
     // Experimento 6    
     /*
-    public static void main(String[] args) {        
-        try {
-            int semillasSensor[] = {1143, 2985, 9847, 8417, 8814, 3954, 2901, 2134, 3911, 2242};
-            int semillasCentros[] = {9180, 8855, 8580, 4110, 2608, 9290, 4591, 5956, 7715, 8908};
-            for (int i = 0; i < 10; ++i) {
-                int numeroCentros = 4;
-                while (numeroCentros <= 10) {
-                    long tiempoInicial = System.nanoTime();
+    public static void main(String[] args) throws Exception {        
+        int semillasSensor[] = {1143, 2985, 9847, 8417, 8814, 3954, 2901, 2134, 3911, 2242};
+        int semillasCentros[] = {9180, 8855, 8580, 4110, 2608, 9290, 4591, 5956, 7715, 8908};
+        for (int i = 0; i < 10; ++i) {
+            int numeroCentros = 4;
+            while (numeroCentros <= 10) {
+                long tiempoInicial = System.nanoTime();
 
-                    Sensores sensores = new Sensores(100, semillasSensor[i]);
-                    CentrosDatos centrosDatos = new CentrosDatos(numeroCentros, semillasCentros[i]);
+                Sensores sensores = new Sensores(100, semillasSensor[i]);
+                CentrosDatos centrosDatos = new CentrosDatos(numeroCentros, semillasCentros[i]);
 
-                    EstadoHC estado = new EstadoHC(sensores, centrosDatos);
-                    estado.generarEstadoInicialGreedy();
+                EstadoHC estado = new EstadoHC(sensores, centrosDatos);
+                estado.generarEstadoInicialGreedy();
 
-                    System.out.print(numeroCentros);
-                    System.out.print(";" + calculaCoste(estado));
-                    System.out.print(";" + calculaPerdidas(estado));
+                System.out.print(numeroCentros);
+                System.out.print(";" + calculaCoste(estado));
+                System.out.print(";" + calculaPerdidas(estado));
 
-                    Problem problem = new Problem(  estado, 
-                                                    new SuccessorFunctionHC(), 
-                                                    new GoalTestHC(),
-                                                    new HeuristicFunctionHC());
+                Problem problem = new Problem(  estado, 
+                                                new SuccessorFunctionSA(), 
+                                                new GoalTestHC(),
+                                                new HeuristicFunctionHC());
 
-                    HillClimbingSearch search = new HillClimbingSearch();
-                    SearchAgent agent = new SearchAgent(problem, search);  
+                SimulatedAnnealingSearch search = new SimulatedAnnealingSearch(10000, 100, 1, 0.01);
+                SearchAgent agent = new SearchAgent(problem, search);  
 
-                    printInstrumentation(agent.getInstrumentation());
-                    System.out.print(";" + ((System.nanoTime() - tiempoInicial)/1e6));
+                printInstrumentation(agent.getInstrumentation());
+                System.out.print(";" + ((System.nanoTime() - tiempoInicial)/1e6));
 
-                    EstadoHC estadoFinal = (EstadoHC) search.getGoalState();            
-                    System.out.print(";" + calculaCoste(estadoFinal));
-                    System.out.print(";" + calculaPerdidas(estadoFinal));
-                    for (int c = 0; c < EstadoHC.NUM_CENTROS; ++c) {
-                        System.out.print(";" + estadoFinal.getRedCentros().get(estadoFinal.getCentro(c)).size());
-                    }
-                    System.out.println();
-                    numeroCentros = numeroCentros + 2;
+                EstadoHC estadoFinal = (EstadoHC) search.getGoalState();            
+                System.out.print(";" + calculaCoste(estadoFinal));
+                System.out.print(";" + calculaPerdidas(estadoFinal));
+                for (int c = 0; c < EstadoHC.NUM_CENTROS; ++c) {
+                    System.out.print(";" + estadoFinal.getRedCentros().get(estadoFinal.getCentro(c)).size());
                 }
                 System.out.println();
-            }    
-        } catch (Exception ex) {
-            Logger.getLogger(PracticaIA.class.getName()).log(Level.SEVERE, null, ex);
+                numeroCentros = numeroCentros + 2;
+            }
+            System.out.println();
         }
-    }
-    */
+    }*/
+    
     
     // Experimento 7
+    /*
     public static void main(String[] args) {        
         try {
             int semillasSensor[] = {1143, 2985, 9847, 8417, 8814, 3954, 2901, 2134, 3911, 2242};
@@ -449,7 +504,7 @@ public class PracticaIA {
         } catch (Exception ex) {
             Logger.getLogger(PracticaIA.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
+    }*/
     
     private static double calculaCoste(EstadoHC estado) {
             double coste = 0.0;

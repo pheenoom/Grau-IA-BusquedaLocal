@@ -5,10 +5,8 @@ import IA.Red.CentrosDatos;
 import IA.Red.Sensor;
 import IA.Red.Sensores;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class EstadoHC{
@@ -30,13 +28,8 @@ public class EstadoHC{
     private double[] sensorCoste;
     
     private HashMap<Integer,HashSet<Integer>> hijosSensores;
-    //En general, el indice de los centros es su numero + numero de sensores
     private HashMap<Integer,HashSet<Integer>> hijosCentros;
-    
-    ////////////////////////////////////////////////////////////////////////////
-    ///                         Metodos privados                             ///
-    ////////////////////////////////////////////////////////////////////////////
-    
+        
     private double calcularDistancia(Sensor a, Sensor b) {
         return Math.sqrt(Math.pow(a.getCoordX() - b.getCoordX(), 2) 
                + Math.pow(a.getCoordY() - b.getCoordY(), 2));
@@ -129,10 +122,6 @@ public class EstadoHC{
     private boolean esCentro(int indice) {
         return indice >= NUM_SENSORES;
     }
-        
-    ////////////////////////////////////////////////////////////////////////////
-    ///                            Constructor                               ///
-    ////////////////////////////////////////////////////////////////////////////
     
     EstadoHC(EstadoHC estado) {
         this.hijosSensores = estado.copiaRedSensores();
@@ -168,10 +157,6 @@ public class EstadoHC{
         matrizDistanciasSensoresACentro = new double[NUM_SENSORES][NUM_CENTROS];
         calcularDistanciasSensoresACentro();
     }
-    
-    ////////////////////////////////////////////////////////////////////////////
-    ///                         Metodos publicos                             ///
-    ////////////////////////////////////////////////////////////////////////////
    
     public final HashMap<Integer, HashSet<Integer>> copiaRedSensores() {
         HashMap<Integer, HashSet<Integer>> copia = new HashMap<>();
@@ -198,9 +183,7 @@ public class EstadoHC{
         
         return copia;
     }
-    
-
-    
+        
     public void generarEstadoInicialRandom() {
         int indiceSensor = 0;
         while (indiceSensor < NUM_SENSORES) {
@@ -214,13 +197,17 @@ public class EstadoHC{
                     indiceDestino = ThreadLocalRandom.current().nextInt(NUM_SENSORES, NUM_CENTROS + NUM_SENSORES);
                     if (centroAceptaConexion(indiceDestino)) {
                         this.hijosCentros.get(indiceDestino).add(indiceSensor);
+                        this.destinos[indiceSensor] = indiceDestino;
+                        this.sensorDataOut[indiceSensor] = sensores.get(indiceSensor).getCapacidad();
                         encontroPadre = true;
                     }    
                 }                
                 else if (!esCentro|| !encontroPadre) {
                     indiceDestino = ThreadLocalRandom.current().nextInt(0, indiceSensor + 1);
                     if (movimientoValido(indiceSensor, indiceDestino)) {
-                        this.hijosSensores.get(indiceDestino).add(indiceSensor);
+                        this.hijosSensores.get(indiceDestino).add(indiceSensor);                        
+                        this.destinos[indiceSensor] = indiceDestino;
+                        this.sensorDataOut[indiceSensor] = sensores.get(indiceSensor).getCapacidad();
                         encontroPadre = true;
                     }
                 }
@@ -360,10 +347,6 @@ public class EstadoHC{
         this.destinos[s] = c;
     }
       
-    //Se ha "movido sensor", por lo tanto hay que comprobar que su nuevo
-    //destino acepta conexiones y que no se ha formado un ciclo 
-    //(si se ha formado un nuevo ciclo, 
-    //necesariamente ha de pasar por 'sensor' y 'destino')
     public boolean movimientoValido(int sensor, int futuroDestino) {        
         return  sensor != futuroDestino
                 && aceptaConexion(futuroDestino) 
@@ -411,7 +394,6 @@ public class EstadoHC{
         return matrizDistanciasEntreSensores[a][b];        
     }
     
-    //Indica el numero de sensor y de centro NO SUS INDICES
     public double getDistanciaSensorACentro(int s, int c) {
         return matrizDistanciasSensoresACentro[s][c];
     }
