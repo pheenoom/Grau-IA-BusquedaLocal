@@ -14,7 +14,9 @@ import aima.search.informed.SimulatedAnnealingSearch;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -29,7 +31,7 @@ public class PracticaIA {
         while (keys.hasNext()) {
             String key = (String) keys.next();
             String property = properties.getProperty(key);
-            System.out.print(";" + property);
+            System.out.println("Nodos: " + property);
         }
 
     }
@@ -44,408 +46,86 @@ public class PracticaIA {
         //System.out.println((String)actions.get(actions.size()-1));
     }
     
-    // Experimento 1
-    /*
-    public static void main(String[] args) {        
-        try {
-            int semillasSensor[] = {1143, 2985, 9847, 8417, 8814, 3954, 2901, 2134, 3911, 2242};
-            int semillasCentros[] = {9180, 8855, 8580, 4110, 2608, 9290, 4591, 5956, 7715, 8908};
-            System.out.println("Generador de estados greedy");
-            for (int i = 0; i < 10; ++i) {
-                    long tiempoInicial = System.nanoTime();
-
-                    Sensores sensores = new Sensores(100, semillasSensor[i]);
-                    CentrosDatos centrosDatos = new CentrosDatos(4, semillasCentros[i]);
-
-                    EstadoHC estado = new EstadoHC(sensores, centrosDatos);
-                    estado.generarEstadoInicialGreedy();
-
-                    System.out.print(calculaCoste(estado));
-                    System.out.print(";" + calculaPerdidas(estado));
-
-                    Problem problem = new Problem(  estado, 
-                                                    new SuccessorFunctionHC(), 
-                                                    new GoalTestHC(),
-                                                    new HeuristicFunctionHC());
-
-                    HillClimbingSearch search = new HillClimbingSearch();
-                    SearchAgent agent = new SearchAgent(problem, search);  
-
-                    printInstrumentation(agent.getInstrumentation());
-                    System.out.print(";" + ((System.nanoTime() - tiempoInicial)/1e6));
-
-                    EstadoHC estadoFinal = (EstadoHC) search.getGoalState();            
-                    System.out.print(";" + calculaCoste(estadoFinal));
-                    System.out.print(";" + calculaPerdidas(estadoFinal));
-                    System.out.println();
-            }         
-        } catch (Exception ex) {
-            Logger.getLogger(PracticaIA.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }*/
-    
-    // Experimento 2
-    /*
-    public static void main(String[] args) {        
-        try {
-            int semillasSensor[] = {1143, 2985, 9847, 8417, 8814, 3954, 2901, 2134, 3911, 2242};
-            int semillasCentros[] = {9180, 8855, 8580, 4110, 2608, 9290, 4591, 5956, 7715, 8908};
-            
-            // Generador de estado Greedy
-            System.out.println("Generador de estados greedy");
-            System.out.println("Tiempo (ms);Nodos;Coste Inicial;Coste Final");
-            for (int i = 0; i < 10; ++i) {
-                    long tiempoInicial = System.nanoTime();
-
-                    Sensores sensores = new Sensores(100, semillasSensor[i]);
-                    CentrosDatos centrosDatos = new CentrosDatos(4, semillasCentros[i]);
-
-                    EstadoHC estado = new EstadoHC(sensores, centrosDatos);
-                    estado.generarEstadoInicialGreedy();
-
-                    double costeInicial = calculaCoste(estado);
-
-                    Problem problem = new Problem(  estado, 
-                                                    new SuccessorFunctionHC(), 
-                                                    new GoalTestHC(),
-                                                    new HeuristicFunctionHC());
-
-                    HillClimbingSearch search = new HillClimbingSearch();
-                    SearchAgent agent = new SearchAgent(problem, search);  
-
-                    System.out.print("" + ((System.nanoTime() - tiempoInicial)/1e6));
-                    printInstrumentation(agent.getInstrumentation());
-                    System.out.print(";" + costeInicial);
-                    EstadoHC estadoFinal = (EstadoHC) search.getGoalState();            
-                    System.out.print(";" + calculaCoste(estadoFinal));
-                    System.out.println();
-            }
-            
-            System.out.println("Generador de estados greedy con ordenacion ascendiente");
-            System.out.println("Tiempo (ms);Nodos;Coste Inicial;Coste Final");
-            // Generador de estado Greedy con ordenacion ascendiente
-            for (int i = 0; i < 10; ++i) {
-                    long tiempoInicial = System.nanoTime();
-
-                    Sensores sensores = new Sensores(100, semillasSensor[i]);
-                    CentrosDatos centrosDatos = new CentrosDatos(4, semillasCentros[i]);
-
-                    EstadoHC estado = new EstadoHC(sensores, centrosDatos);
-                    estado.generarEstadoInicialOrdenado(true);
-
-                    double costeInicial = calculaCoste(estado);
-
-                    Problem problem = new Problem(  estado, 
-                                                    new SuccessorFunctionHC(), 
-                                                    new GoalTestHC(),
-                                                    new HeuristicFunctionHC());
-
-                    HillClimbingSearch search = new HillClimbingSearch();
-                    SearchAgent agent = new SearchAgent(problem, search);  
-
-                    System.out.print("" + ((System.nanoTime() - tiempoInicial)/1e6));
-                    printInstrumentation(agent.getInstrumentation());
-                    System.out.print(";" + costeInicial);
-                    EstadoHC estadoFinal = (EstadoHC) search.getGoalState();            
-                    System.out.print(";" + calculaCoste(estadoFinal));
-                    System.out.println();
-            }
-            
-            // Generador de estado Greedy con ordenacion descendiente
-            System.out.println("Generador de estados greedy con ordenacion descendiente");
-            System.out.println("Tiempo (ms);Nodos;Coste Inicial;Coste Final");
-            for (int i = 0; i < 10; ++i) {
-                    long tiempoInicial = System.nanoTime();
-
-                    Sensores sensores = new Sensores(100, semillasSensor[i]);
-                    CentrosDatos centrosDatos = new CentrosDatos(4, semillasCentros[i]);
-
-                    EstadoHC estado = new EstadoHC(sensores, centrosDatos);
-                    estado.generarEstadoInicialOrdenado(false);
-
-                    double costeInicial = calculaCoste(estado);
-
-                    Problem problem = new Problem(  estado, 
-                                                    new SuccessorFunctionHC(), 
-                                                    new GoalTestHC(),
-                                                    new HeuristicFunctionHC());
-
-                    HillClimbingSearch search = new HillClimbingSearch();
-                    SearchAgent agent = new SearchAgent(problem, search);  
-
-                    System.out.print("" + ((System.nanoTime() - tiempoInicial)/1e6));
-                    printInstrumentation(agent.getInstrumentation());
-                    System.out.print(";" + costeInicial);
-                    EstadoHC estadoFinal = (EstadoHC) search.getGoalState();            
-                    System.out.print(";" + calculaCoste(estadoFinal));
-                    System.out.println();
-            }
-            
-            System.out.println("Generador de estados random");
-            System.out.println("Tiempo (ms);Nodos;Coste Inicial;Coste Final");
-            for (int i = 0; i < 10; ++i) {
-                for (int j = 0; j< 5; ++j) {
-                    long tiempoInicial = System.nanoTime();
-
-                    Sensores sensores = new Sensores(NUM_SENSORES, semillasSensor[i]);
-                    CentrosDatos centrosDatos = new CentrosDatos(NUM_CENTROS, semillasCentros[i]);
-
-                    EstadoHC estado = new EstadoHC(sensores, centrosDatos);
-                    estado.generarEstadoInicialRandom();
-                    
-                    double costeInicial = calculaCoste(estado);
-
-                    Problem problem = new Problem(  estado, 
-                                                    new SuccessorFunctionHC(), 
-                                                    new GoalTestHC(),
-                                                    new HeuristicFunctionHC());
-
-                    HillClimbingSearch search = new HillClimbingSearch();
-                    SearchAgent agent = new SearchAgent(problem, search);  
-
-                    System.out.print("" + ((System.nanoTime() - tiempoInicial)/1e6));
-                    printInstrumentation(agent.getInstrumentation());
-                    System.out.print(";" + costeInicial);
-                    EstadoHC estadoFinal = (EstadoHC) search.getGoalState();            
-                    System.out.print(";" + calculaCoste(estadoFinal));
-                    System.out.println();
-                }
-                System.out.println("==================================================================");              
-            }
-        } catch (Exception ex) {
-            Logger.getLogger(PracticaIA.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    */
-    
-    
+   
         // Cuantos pasos voy hacer, cuanto mas grande es el numeror mejor es la solucion
     // K = cuanta velocidad tengo que empezar a saltar menos. K mayor es mas estricto es, mas rapido cae la aleatoridad.
     // lambda = propabilidad de cojer un estado. lambda mas pequeño , la probabilidad de cojer uno malo es menor.
     // 
     
     // Experimento 3
-    /*    
+    public static double experimento3(int steps, int stiter, int k, double lamb, int semillaSensor, int semillaCentro) throws Exception {
+        Sensores sensores = new Sensores(100, semillaSensor);
+        CentrosDatos centrosDatos = new CentrosDatos(4, semillaCentro);
+
+        EstadoHC estado = new EstadoHC(sensores, centrosDatos);
+        estado.generarEstadoInicialGreedy();
+
+        //System.out.println("Coste Inicial: " + calculaCoste(estado));
+        //System.out.println("Perdida Inicial: " + calculaPerdidas(estado));
+
+        Problem problem = new Problem(  estado, 
+                                        new SuccessorFunctionSA(), 
+                                        new GoalTestHC(),
+                                        new HeuristicFunctionHC());
+
+        SimulatedAnnealingSearch search = new SimulatedAnnealingSearch(steps, stiter, k, lamb);
+        SearchAgent agent = new SearchAgent(problem, search);  
+
+        
+
+        EstadoHC estadoFinal =(EstadoHC) search.getGoalState();  
+        return calculaCoste(estadoFinal);
+        //System.out.println("Coste Final: " + calculaCoste(estadoFinal));
+        //System.out.println("Perdida Final: " + calculaPerdidas(estadoFinal));
+        //System.out.println();
+        //printActions(agent.getActions());
+    }
+    
     public static void main(String[] args) {        
         try {
+            
             int steps = 10000;
-            int stiter = 10;
-            int k = 100;
-            double lamb = 0.01;
+            int stiter = 100;
+            LinkedList<Integer> kas = new LinkedList<>();
+            kas.add(1);
+            kas.add(2);
+            kas.add(3);
+            kas.add(5);
+            kas.add(8);
+            kas.add(10);
+            kas.add(15);
+            kas.add(20);
+            kas.add(50);
+            kas.add(100);
             
-            int semillasSensor[] = {1143, 2985, 9847, 8417, 8814, 3954, 2901, 2134, 3911, 2242};
-            int semillasCentros[] = {9180, 8855, 8580, 4110, 2608, 9290, 4591, 5956, 7715, 8908};
+            LinkedList<Double> lambdas = new LinkedList<>();
+            lambdas.add(0.1);
+            lambdas.add(0.01);
+            lambdas.add(0.001);
+            lambdas.add(0.0001);
+            lambdas.add(0.00001);
             
-            System.out.println("K;Lambda;Steps;CosteInicial;PerdidasInicial;Nodos;Tiempo;CosteFinal;PerdidasFinal");
-            //for (int i = 0; i < 20; ++i) {
-                System.out.print(k + ";" + lamb + ";" + steps + ";");
-                long tiempoInicial = System.nanoTime();
-
-                Sensores sensores = new Sensores(100, semillasSensor[0]);
-                CentrosDatos centrosDatos = new CentrosDatos(4, semillasCentros[0]);
-
-                EstadoHC estado = new EstadoHC(sensores, centrosDatos);
-                estado.generarEstadoInicialGreedy();
-
-                System.out.print(calculaCoste(estado));
-                System.out.print(";" + calculaPerdidas(estado));
-
-                Problem problem = new Problem(  estado, 
-                                                new SuccessorFunctionSA(), 
-                                                new GoalTestHC(),
-                                                new HeuristicFunctionHC());
-
-                SimulatedAnnealingSearch search = new SimulatedAnnealingSearch(steps, stiter, k, lamb);
-                SearchAgent agent = new SearchAgent(problem, search);  
-                
-                printInstrumentation(agent.getInstrumentation());
-                System.out.print(";" + ((System.nanoTime() - tiempoInicial)/1e6));
-
-                EstadoHC estadoFinal =(EstadoHC) search.getGoalState();            
-                System.out.print(";" + calculaCoste(estadoFinal));
-                System.out.print(";" + calculaPerdidas(estadoFinal));
-                System.out.println();
-                printActions(agent.getActions());
-                steps = steps + 1000;
-            //}
-        } catch (Exception ex) {
-            Logger.getLogger(PracticaIA.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    */
-    
-    
-    // Experimento 4    
-    /*
-    public static void main(String[] args) {        
-        try {
-            int semillasSensor[] = {1143, 2985, 9847, 8417, 8814, 3954, 2901, 2134, 3911, 2242};
-            int semillasCentros[] = {9180, 8855, 8580, 4110, 2608, 9290, 4591, 5956, 7715, 8908};
-            int numeroCentros = 4;
-            int numeroSensores = 100;
-            while(true) {
-                long tiempoInicial = System.nanoTime();
-
-                Sensores sensores = new Sensores(numeroSensores, semillasSensor[9]);
-                CentrosDatos centrosDatos = new CentrosDatos(numeroCentros, semillasCentros[9]);
-
-                EstadoHC estado = new EstadoHC(sensores, centrosDatos);
-                estado.generarEstadoInicialGreedy();
-
-                System.out.print(calculaCoste(estado));
-                System.out.print(";" + calculaPerdidas(estado));
-
-                Problem problem = new Problem(  estado, 
-                                                new SuccessorFunctionHC(), 
-                                                new GoalTestHC(),
-                                                new HeuristicFunctionHC());
-
-                HillClimbingSearch search = new HillClimbingSearch();
-                SearchAgent agent = new SearchAgent(problem, search);  
-
-                printInstrumentation(agent.getInstrumentation());
-                System.out.print(";" + ((System.nanoTime() - tiempoInicial)/1e6));
-
-                EstadoHC estadoFinal =(EstadoHC) search.getGoalState();            
-                System.out.print(";" + calculaCoste(estadoFinal));
-                System.out.print(";" + calculaPerdidas(estadoFinal));
-                System.out.print(";" + numeroCentros);
-                System.out.print(";" + numeroSensores);
-                System.out.println();
-                numeroCentros = numeroCentros + 2;
-                numeroSensores = numeroSensores + 50;
-            }
-        } catch (Exception ex) {
-            Logger.getLogger(PracticaIA.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }     
-    */
-    
-    // Experimento 5
-    /*
-    public static void main(String[] args) {        
-        try {
-            int semillasSensor[] = {1143, 2985, 9847, 8417, 8814, 3954, 2901, 2134, 3911, 2242};
-            int semillasCentros[] = {9180, 8855, 8580, 4110, 2608, 9290, 4591, 5956, 7715, 8908};
-            for (int i = 0; i < 10; ++i) {
-                    long tiempoInicial = System.nanoTime();
-
-                    Sensores sensores = new Sensores(100, semillasSensor[i]);
-                    CentrosDatos centrosDatos = new CentrosDatos(4, semillasCentros[i]);
-
-                    EstadoHC estado = new EstadoHC(sensores, centrosDatos);
-                    estado.generarEstadoInicialGreedy();
-
-                    System.out.print(calculaCoste(estado));
-                    System.out.print(";" + calculaPerdidas(estado));
-
-                    Problem problem = new Problem(  estado, 
-                                                    new SuccessorFunctionHC(), 
-                                                    new GoalTestHC(),
-                                                    new HeuristicFunctionHC());
-
-                    HillClimbingSearch search = new HillClimbingSearch();
-                    SearchAgent agent = new SearchAgent(problem, search);  
-
-                    printInstrumentation(agent.getInstrumentation());
-                    System.out.print(";" + ((System.nanoTime() - tiempoInicial)/1e6));
-
-                    EstadoHC estadoFinal = (EstadoHC) search.getGoalState();            
-                    System.out.print(";" + calculaCoste(estadoFinal));
-                    System.out.print(";" + calculaPerdidas(estadoFinal));
-                    for (int c = 0; c < EstadoHC.NUM_CENTROS; ++c) {
-                        System.out.print(";" + estadoFinal.getRedCentros().get(estadoFinal.getCentro(c)).size());
-                    }
-                    System.out.println();
-            }    
-        } catch (Exception ex) {
-            Logger.getLogger(PracticaIA.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    */
-    
-    // Experimento 6    
-    /*
-    public static void main(String[] args) {        
-        try {
-            int semillasSensor[] = {1143, 2985, 9847, 8417, 8814, 3954, 2901, 2134, 3911, 2242};
-            int semillasCentros[] = {9180, 8855, 8580, 4110, 2608, 9290, 4591, 5956, 7715, 8908};
-            for (int i = 0; i < 10; ++i) {
-                int numeroCentros = 4;
-                while (numeroCentros <= 10) {
-                    long tiempoInicial = System.nanoTime();
-
-                    Sensores sensores = new Sensores(100, semillasSensor[i]);
-                    CentrosDatos centrosDatos = new CentrosDatos(numeroCentros, semillasCentros[i]);
-
-                    EstadoHC estado = new EstadoHC(sensores, centrosDatos);
-                    estado.generarEstadoInicialGreedy();
-
-                    System.out.print(numeroCentros);
-                    System.out.print(";" + calculaCoste(estado));
-                    System.out.print(";" + calculaPerdidas(estado));
-
-                    Problem problem = new Problem(  estado, 
-                                                    new SuccessorFunctionHC(), 
-                                                    new GoalTestHC(),
-                                                    new HeuristicFunctionHC());
-
-                    HillClimbingSearch search = new HillClimbingSearch();
-                    SearchAgent agent = new SearchAgent(problem, search);  
-
-                    printInstrumentation(agent.getInstrumentation());
-                    System.out.print(";" + ((System.nanoTime() - tiempoInicial)/1e6));
-
-                    EstadoHC estadoFinal = (EstadoHC) search.getGoalState();            
-                    System.out.print(";" + calculaCoste(estadoFinal));
-                    System.out.print(";" + calculaPerdidas(estadoFinal));
-                    for (int c = 0; c < EstadoHC.NUM_CENTROS; ++c) {
-                        System.out.print(";" + estadoFinal.getRedCentros().get(estadoFinal.getCentro(c)).size());
-                    }
-                    System.out.println();
-                    numeroCentros = numeroCentros + 2;
-                }
-                System.out.println();
-            }    
-        } catch (Exception ex) {
-            Logger.getLogger(PracticaIA.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    */
-    
-    // Experimento 7
-    public static void main(String[] args) {        
-        try {
-            int semillasSensor[] = {1143, 2985, 9847, 8417, 8814, 3954, 2901, 2134, 3911, 2242};
-            int semillasCentros[] = {9180, 8855, 8580, 4110, 2608, 9290, 4591, 5956, 7715, 8908};
-            for (int i = 0; i < 10; ++i) {
-                    long tiempoInicial = System.nanoTime();
-
-                    Sensores sensores = new Sensores(100, semillasSensor[i]);
-                    CentrosDatos centrosDatos = new CentrosDatos(2, semillasCentros[i]);
-
-                    EstadoHC estado = new EstadoHC(sensores, centrosDatos);
-                    estado.generarEstadoInicialGreedy();
+            for(int k : kas) {
+                for (double lamb : lambdas) {
+                    int semillasSensor[] = {1143, 2985, 9847, 8417, 8814, 3954, 2901, 2134, 3911, 2242};
+                    int semillasCentros[] = {9180, 8855, 8580, 4110, 2608, 9290, 4591, 5956, 7715, 8908};
                     
-                    System.out.print(calculaCoste(estado));
-                    System.out.print(";" + calculaPerdidas(estado));
-
-                    Problem problem = new Problem(  estado, 
-                                                    new SuccessorFunctionHC(), 
-                                                    new GoalTestHC(),
-                                                    new HeuristicFunctionHC());
-
-                    HillClimbingSearch search = new HillClimbingSearch();
-                    SearchAgent agent = new SearchAgent(problem, search);  
-
-                    printInstrumentation(agent.getInstrumentation());
-                    System.out.print(";" + ((System.nanoTime() - tiempoInicial)/1e6));
-
-                    EstadoHC estadoFinal = (EstadoHC) search.getGoalState();            
-                    System.out.print(";" + calculaCoste(estadoFinal));
-                    System.out.print(";" + calculaPerdidas(estadoFinal));
-                    System.out.println();
-            }    
+                    String filename = steps+"steps_" + k + "k_" + lamb + "lamb_";
+                    PrintWriter writer = new PrintWriter(filename);
+                    System.out.println(filename);
+                    
+                    for (int i = 0; i < 10; ++i) {
+                        //String filename = steps+"steps_" + k + "k_" + lamb + "lamb_" + semillasSensor[i] +  "semillaSensor_" + semillasCentros[i] + "semillasCentro";
+                        
+                        for (int j = 0; j < 20; ++j) {
+                            double cost = experimento3(steps, stiter, k, lamb, semillasSensor[i], semillasCentros[i]);
+                            writer.write(String.valueOf(cost)+"\n");
+                        }
+                    }
+                    
+                    writer.close();
+                }
+            }
         } catch (Exception ex) {
             Logger.getLogger(PracticaIA.class.getName()).log(Level.SEVERE, null, ex);
         }
